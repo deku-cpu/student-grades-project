@@ -4,3 +4,6 @@ from .group import Group
 from .specialty import Specialty
 from .student import Student
 from .teacher import Teacher
+from .semester import Semester
+from .teaching import Teaching
+from .grade import Grade

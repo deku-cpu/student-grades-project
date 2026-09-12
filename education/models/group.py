@@ -9,3 +9,6 @@ class Group(models.Model):
     course = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(6)])
     admission_year = models.PositiveSmallIntegerField(validators=[MinValueValidator(2000)])
     curator = models.ForeignKey('Teacher', on_delete=models.SET_NULL, null=True, blank=True, related_name='curated_groups')
+
+    def __str__(self):
+        return self.name
