@@ -11,3 +11,6 @@ class Discipline(models.Model):
     hours_practice = models.PositiveSmallIntegerField(default=0)
     hours_lab = models.PositiveSmallIntegerField(default=0)
     control_form = models.CharField(max_length=15, choices=ControlForm.choices)
+
+    def __str__(self):
+        return self.name

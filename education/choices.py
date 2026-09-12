@@ -29,3 +29,15 @@ class PositionStatus(models.TextChoices):
 class AcademicDegreeStatus(models.TextChoices):
     CANDIDATE_OF_SCIENCES = 'candidate_of_sciences', 'Кандидат Наук'
     DOCTOR_OF_SCIENCE = 'doctor_of_science', 'Доктор Наук'
+
+class SemesterNumber(models.IntegerChoices):
+    FIRST = 1, '1 семестр'
+    SECOND = 2, '2 семестр'
+
+class GradeStatus(models.TextChoices):
+    TWO = '2'
+    THREE = '3'
+    FOUR = '4'
+    FIVE = '5'
+    PASS = 'pass', 'Зачет'
+    FAIL = 'fail', 'Незачет'
