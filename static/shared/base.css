@@ -1,0 +1,39 @@
+:root {
+  --bg-start: #0f1b33;
+  --bg-mid: #16244a;
+  --bg-end: #1e2f55;
+  --gold: #c9a227;
+  --gold-light: #e6c767;
+  --card-bg: #ffffff;
+  --text-dark: #1b2437;
+  --text-muted: #6b7280;
+  --border: #e2e5ea;
+  --border-hover: #c7cede;
+  --radius-lg: 20px;
+  --radius-md: 12px;
+}
+
+
+
+*{ 
+    box-sizing: border-box; 
+}
+
+body,html{
+    height: 100%;
+    margin: 0;
+}
+body {
+    font-family: "Inter", system-ui, sans-serif;
+    color: var(--text-dark);
+    background: #f5f7fa;
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+main {
+    flex: 1;
+}
