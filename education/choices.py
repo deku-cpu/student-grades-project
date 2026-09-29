@@ -35,9 +35,9 @@ class SemesterNumber(models.IntegerChoices):
     SECOND = 2, '2 семестр'
 
 class GradeStatus(models.TextChoices):
-    TWO = '2'
-    THREE = '3'
-    FOUR = '4'
-    FIVE = '5'
+    TWO = '2', '2 (неудовлетворительно)'
+    THREE = '3', '3 (удовлетворительно)'
+    FOUR = '4', '4 (хорошо)'
+    FIVE = '5', '5 (отлично)'
     PASS = 'pass', 'Зачет'
     FAIL = 'fail', 'Незачет'
