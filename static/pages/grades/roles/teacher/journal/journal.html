@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Журнал — учитель</title>
+    <link rel="stylesheet" href="../../../../../shared/base.css">
+    <link rel="stylesheet" href="../../../../../shared/components.css">
+    <link rel="stylesheet" href="journal.css">
+</head>
+<body>
+
+<div id="header"></div>
+
+<main>
+    <h1>Журнал группы</h1>
+
+    <div class="journal-filters">
+        <div class="field">
+            <label for="filterSubject">Предмет</label>
+            <select id="filterSubject">
+                <option value="prog">Программирование</option>
+                <option value="math">Математика</option>
+                <option value="db">Базы данных</option>
+            </select>
+        </div>
+        <div class="field">
+            <label for="filterGroup">Группа</label>
+            <select id="filterGroup">
+                <option value="1">ПИЭ-23-2</option>
+                <option value="2">ИВТ-22-1</option>
+                <option value="3">УИ-25-5</option>
+            </select>
+        </div>
+        <button class="btn btn--primary" id="addLessonBtn">
+            Добавить занятие
+        </button>
+    </div>
+
+    <div id="grades-body"></div>
+</main>
+
+<div id="footer"></div>
+
+<form id="lessonModal" class="modal hidden">
+    <div class="field">
+        <label for="lessonDate">Дата</label>
+        <input id="lessonDate" name="date" type="date" required>
+    </div>
+    <div class="field">
+        <label for="lessonTopic">Тема</label>
+        <input id="lessonTopic" name="topic" required>
+    </div>
+    <div class="field">
+        <label for="lessonType">Тип</label>
+        <select id="lessonType" name="type">
+            <option value="lesson">Работа на занятии</option>
+            <option value="homework">Домашняя работа</option>
+            <option value="control">Контрольная</option>
+            <option value="exam">Экзамен</option>
+        </select>
+    </div>
+    <div>
+        <button type="submit" class="btn btn--primary">Добавить</button>
+        <button type="button" class="btn btn--secondary" id="cancelLesson">Отменить</button>
+    </div>
+</form>
+
+<script src="../../../../../shared/menu-config.js"></script>
+<script src="../../../../../shared/components.js"></script>
+<script src="../../../../../shared/grades-table.js"></script>
+<script src="journal.js"></script>
+<script>
+    document.getElementById('header').innerHTML = renderHeader();
+    document.getElementById('footer').innerHTML = renderFooter();
+</script>
+
+</body>
+</html>

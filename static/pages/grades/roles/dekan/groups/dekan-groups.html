@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Группы — декан</title>
+    <link rel="stylesheet" href="../../../../../shared/base.css">
+    <link rel="stylesheet" href="../../../../../shared/components.css">
+    <link rel="stylesheet" href="dekan-groups.css">
+</head>
+<body>
+<div id="header"></div>
+
+<main>
+    <h1>Группы</h1>
+
+    <div class="field">
+        <label for="filterName">Поиск по названию</label>
+        <input id="filterName">
+    </div>
+
+    <div class="field">
+        <label for="filterYearOfStudy">Номер курса</label>
+        <select id="filterYearOfStudy">
+            <option value="">Все курсы</option>
+            <option value="1">1 курс</option>
+            <option value="2">2 курс</option>
+            <option value="3">3 курс</option>
+            <option value="4">4 курс</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label for="filterEduForm">Вид обучения</label>
+        <select id="filterEduForm">
+            <option value="">Все виды обучения</option>
+            <option value="budget">Бюджет</option>
+            <option value="contract">Контракт</option>
+        </select>
+    </div>
+
+    <div id="groups-body"></div>
+</main>
+
+<div id="footer"></div>
+
+<script src="../../../../../shared/menu-config.js"></script>
+<script src="../../../../../shared/components.js"></script>
+<script src="../../../../../shared/groups-config.js"></script>
+<script src="../../../../../shared/table.js"></script>
+<script src="dekan-groups.js"></script>
+<script>
+    document.getElementById('header').innerHTML = renderHeader();
+    document.getElementById('footer').innerHTML = renderFooter();
+</script>
+
+</body>
+</html>
