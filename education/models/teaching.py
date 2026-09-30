@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Teaching(models.Model):
+    # Группа, кто ведет, что ведет, когда ведет
     group = models.ForeignKey('Group', on_delete=models.PROTECT, related_name='teachings')
     discipline = models.ForeignKey('Discipline', on_delete=models.PROTECT, related_name='teachings')
     semester = models.ForeignKey('Semester', on_delete=models.PROTECT, related_name='teachings')

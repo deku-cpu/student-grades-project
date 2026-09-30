@@ -35,9 +35,21 @@ class SemesterNumber(models.IntegerChoices):
     SECOND = 2, '2 семестр'
 
 class GradeStatus(models.TextChoices):
-    TWO = '2'
-    THREE = '3'
-    FOUR = '4'
-    FIVE = '5'
+    TWO = '2', '2 (неудовлетворительно)'
+    THREE = '3', '3 (удовлетворительно)'
+    FOUR = '4', '4 (хорошо)'
+    FIVE = '5', '5 (отлично)'
     PASS = 'pass', 'Зачет'
     FAIL = 'fail', 'Незачет'
+
+class GroupStatus(models.TextChoices):
+    FULL_TIME = 'full_time', 'Очная'
+    PART_TIME = 'part_time', 'Заочная'
+    HYBRID_PROGRAM = 'hybrid_program', 'Очно-заочная'
+
+class GradeType(models.TextChoices):
+    LAB_ASSIGNMENT = 'lab_assignment', 'Лабораторная'
+    CONTROL_WORK = 'control_work', 'Контрольная'
+    COURSE_WORK = 'course_work', 'Курсовая'
+    EXAM = 'exam', 'Экзамен'
+    CREDIT = 'credit', 'Зачет'
