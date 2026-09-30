@@ -7,3 +7,4 @@ from .teacher import Teacher
 from .semester import Semester
 from .teaching import Teaching
 from .grade import Grade
+from .assignment import Assignment

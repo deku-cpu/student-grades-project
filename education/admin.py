@@ -51,7 +51,14 @@ class SemesterAdmin(admin.ModelAdmin):
 
 @admin.register(Grade)
 class GradeAdmin(admin.ModelAdmin):
-    list_display = ('student', 'teaching', 'value')
-    list_filter = ('teaching__semester', 'teaching__discipline', 'value')
+    list_display = ('student', 'assignment', 'value')
+    list_filter = ('assignment__teaching__semester', 'assignment__teaching__discipline', 'value')
     search_fields = ('student__last_name', 'student__first_name')
-    autocomplete_fields = ('student', 'teaching')
+    autocomplete_fields = ('student', 'assignment')
+
+@admin.register(Assignment)
+class AssignmentAdmin(admin.ModelAdmin):
+    list_display = ('teaching', 'title', 'grade_type', 'weight', 'order')
+    list_filter = ('grade_type',)
+    search_fields = ('title', 'teaching__discipline__name')
+    autocomplete_fields = ('teaching',)
