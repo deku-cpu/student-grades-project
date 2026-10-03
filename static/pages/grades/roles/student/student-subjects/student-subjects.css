@@ -1,0 +1,73 @@
+#subjects-body {
+    margin-top: 16px;
+    overflow-x: auto;              /* скролл, если таблица не влезет */
+    -webkit-overflow-scrolling: touch;
+    border-radius: 6px;
+}
+
+#subjects-body .empty {
+    padding: 24px 12px;
+    text-align: center;
+    opacity: 0.6;
+    font-size: 14px;
+}
+
+#subjects-body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+#subjects-body th,
+#subjects-body td {
+    border: 1px solid #ddd;
+    padding: 6px 8px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+#subjects-body td:last-child {
+    white-space: nowrap;
+}
+
+#subjects-body .btn {
+    padding: 6px 10px;
+    font-size: 13px;
+    min-height: 32px;
+}
+
+
+/* ПЛАНШЕТ */
+@media (min-width: 601px) {
+    #subjects-body {
+        margin-top: 20px;
+    }
+
+    #subjects-body table {
+        font-size: 14px;
+    }
+
+    #subjects-body th,
+    #subjects-body td {
+        padding: 8px 10px;
+    }
+
+    #subjects-body .btn {
+        padding: 8px 14px;
+        font-size: 14px;
+        min-height: 36px;
+    }
+}
+
+
+/* ПК */
+@media (min-width: 1025px) {
+    #subjects-body {
+        margin-top: 24px;
+    }
+
+    #subjects-body th,
+    #subjects-body td {
+        padding: 10px 12px;
+    }
+}

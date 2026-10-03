@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои занятия</title>
+    <link rel="stylesheet" href="../../../../../shared/base.css">
+    <link rel="stylesheet" href="../../../../../shared/components.css">
+    <link rel="stylesheet" href="teacher-groups.css">
+</head>
+<body>
+
+<div id="header"></div>
+
+<main>
+    <h1>Мои занятия</h1>
+
+    <div class="field">
+        <label for="filterGroup">Группа</label>
+        <select id="filterGroup">
+            <option value="">Все группы</option>
+            <option value="1">ПИЭ-23-2</option>
+            <option value="2">ИВТ-22-1</option>
+            <option value="3">УИ-25-5</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label for="filterSubject">Предмет</label>
+        <select id="filterSubject">
+            <option value="">Все предметы</option>
+            <option value="math">Математика</option>
+            <option value="prog">Программирование</option>
+            <option value="db">Базы данных</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label for="filterDate">Дата</label>
+        <input id="filterDate" type="date">
+    </div>
+
+    <button class="btn btn--primary" id="addLessonBtn">
+        Добавить занятие
+    </button>
+
+    <div id="lessons-body"></div>
+</main>
+
+<div id="footer"></div>
+
+<!-- модалка добавления/редактирования занятия -->
+<form id="editingModal" class="modal hidden">
+    <div class="field">
+        <label for="editGroup">Группа</label>
+        <select id="editGroup" name="groupId">
+            <option value="1">ПИЭ-23-2</option>
+            <option value="2">ИВТ-22-1</option>
+            <option value="3">УИ-25-5</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label for="editSubject">Предмет</label>
+        <select id="editSubject" name="subject">
+            <option value="math">Математика</option>
+            <option value="prog">Программирование</option>
+            <option value="db">Базы данных</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label for="editDate">Дата</label>
+        <input id="editDate" name="date" type="date">
+    </div>
+
+    <div class="field">
+        <label for="editTopic">Тема занятия</label>
+        <input id="editTopic" name="topic">
+    </div>
+
+    <div class="field">
+        <label for="editType">Тип работы</label>
+        <select id="editType" name="type">
+            <option value="lesson">Работа на занятии</option>
+            <option value="homework">Домашняя работа</option>
+            <option value="control">Контрольная</option>
+            <option value="exam">Экзамен</option>
+        </select>
+    </div>
+
+    <div>
+        <button type="submit" class="btn btn--primary">Сохранить</button>
+        <button type="button" class="btn btn--secondary" id="cancelEdit">Отменить</button>
+    </div>
+</form>
+
+<script src="../../../../../shared/menu-config.js"></script>
+<script src="../../../../../shared/components.js"></script>
+<script src="../../../../../shared/table.js"></script>
+<script src="teacher-groups.js"></script>
+<script>
+    document.getElementById('header').innerHTML = renderHeader();
+    document.getElementById('footer').innerHTML = renderFooter();
+</script>
+
+</body>
+</html>

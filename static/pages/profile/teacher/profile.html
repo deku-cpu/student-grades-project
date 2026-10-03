@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль — учитель</title>
+    <link rel="stylesheet" href="../../../shared/base.css">
+    <link rel="stylesheet" href="../../../shared/components.css">
+    <link rel="stylesheet" href="profile.css">
+</head>
+<body>
+
+<div id="header"></div>
+
+<main>
+    <h1>Мой профиль</h1>
+
+    <div class="profile-card">
+        <div class="profile-card__avatar">ИИ</div>
+        <div class="profile-card__main">
+            <h2 id="profileName">Иванов Иван Иванович</h2>
+            <p id="profilePosition" class="profile-card__subtitle">Доцент</p>
+        </div>
+    </div>
+
+    <div class="profile-grid">
+        <div class="profile-field">
+            <span class="profile-field__label">Логин</span>
+            <span class="profile-field__value" id="profileLogin">—</span>
+        </div>
+        <div class="profile-field">
+            <span class="profile-field__label">Кафедра</span>
+            <span class="profile-field__value" id="profileDepartment">—</span>
+        </div>
+        <div class="profile-field">
+            <span class="profile-field__label">Email</span>
+            <span class="profile-field__value" id="profileEmail">—</span>
+        </div>
+        <div class="profile-field">
+            <span class="profile-field__label">Телефон</span>
+            <span class="profile-field__value" id="profilePhone">—</span>
+        </div>
+    </div>
+
+    <h2 class="profile-section-title">Предметы</h2>
+    <div id="profileSubjects" class="profile-tags"></div>
+
+</main>
+
+<div id="footer"></div>
+
+<script src="../../../shared/menu-config.js"></script>
+<script src="../../../shared/components.js"></script>
+<script src="profile.js"></script>
+<script>
+    document.getElementById('header').innerHTML = renderHeader();
+    document.getElementById('footer').innerHTML = renderFooter();
+</script>
+
+</body>
+</html>

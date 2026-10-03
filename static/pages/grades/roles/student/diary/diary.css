@@ -1,0 +1,202 @@
+main {
+    padding: 12px;
+    max-width: 1400px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+h1 {
+    font-size: 20px;
+    margin: 0 0 12px;
+}
+
+.journal-filters {
+    display: flex;
+    flex-direction: column;       /* на телефоне в столбик */
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.journal-filters .field {
+    width: 100%;
+}
+
+.journal-filters select,
+.journal-filters input {
+    width: 100%;
+}
+
+/* таблица */
+#grades-body {
+    margin-top: 12px;
+    overflow-x: auto;              /* скролл вправо, если не влезает */
+    -webkit-overflow-scrolling: touch;
+    border-radius: 6px;
+}
+
+#grades-body .empty {
+    padding: 24px 12px;
+    text-align: center;
+    opacity: 0.6;
+    font-size: 14px;
+}
+
+/* таблица */
+.grades-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12px;
+}
+
+.grades-table th,
+.grades-table td {
+    border: 1px solid #ddd;
+    padding: 4px 6px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.grades-table th {
+    background: #f5f5f5;
+    position: relative;
+}
+
+.grades-sticky-col {
+    position: sticky;
+    left: 0;
+    background: #fff;
+    text-align: left;
+    min-width: 110px;
+    max-width: 140px;
+    z-index: 2;
+    font-size: 12px;
+}
+
+.grades-table th.grades-sticky-col {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    background: #f5f5f5;
+}
+
+.grades-sticky-avg {
+    position: sticky;
+    right: 0;
+    background: #fffbe6;
+    font-weight: 600;
+    min-width: 55px;
+    z-index: 2;
+    font-size: 12px;
+}
+
+.grades-table th.grades-sticky-avg {
+    position: sticky;
+    top: 0;
+    right: 0;
+    z-index: 3;
+    background: #fff3c4;
+}
+
+.grades-th-topic {
+    font-weight: normal;
+    font-size: 10px;
+    opacity: 0.7;
+    white-space: normal;
+    max-width: 90px;
+}
+
+.grades-cell {
+    width: 32px;
+    min-width: 32px;
+}
+
+
+/* ПЛАНШЕТ  (от 601px) */
+@media (min-width: 601px) {
+    main {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 24px;
+        margin-bottom: 16px;
+    }
+
+    .journal-filters {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .journal-filters .field {
+        width: auto;
+        min-width: 180px;
+    }
+
+    .grades-table {
+        font-size: 13px;
+    }
+
+    .grades-table th,
+    .grades-table td {
+        padding: 5px 7px;
+    }
+
+    .grades-sticky-col {
+        min-width: 150px;
+        max-width: none;
+        font-size: 13px;
+    }
+
+    .grades-sticky-avg {
+        min-width: 65px;
+        font-size: 13px;
+    }
+
+    .grades-th-topic {
+        font-size: 11px;
+        max-width: 110px;
+    }
+
+    .grades-cell {
+        width: 36px;
+        min-width: 36px;
+    }
+}
+
+
+/* ПК  (от 1025px) */
+@media (min-width: 1025px) {
+    main {
+        padding: 24px 32px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    .grades-table {
+        font-size: 14px;
+    }
+
+    .grades-table th,
+    .grades-table td {
+        padding: 6px 8px;
+    }
+
+    .grades-sticky-col {
+        min-width: 180px;
+    }
+
+    .grades-sticky-avg {
+        min-width: 80px;
+    }
+
+    .grades-cell {
+        width: 40px;
+        min-width: 40px;
+    }
+}
