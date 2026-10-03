@@ -18,9 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from education.urls import api_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include(api_urlpatterns)),
+    path('', include('education.urls'))
 ]
 
 if settings.DEBUG:

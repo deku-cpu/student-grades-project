@@ -5,11 +5,12 @@ from django.core.management.base import BaseCommand
 
 from education.models import (
     Specialty, Department, Semester, Teacher, Group,
-    Student, Discipline, Teaching, Grade,
+    Student, Discipline, Teaching, Assignment, Grade,
 )
 from education.choices import (
     PositionStatus, AcademicDegreeStatus, Gender,
     EducationForm, StudentStatus, ControlForm, GradeStatus,
+    GroupStatus, GradeType,
 )
 
 
@@ -25,6 +26,7 @@ class Command(BaseCommand):
         self.create_students()
         self.create_disciplines()
         self.create_teaching()
+        self.create_assignments()
         self.create_grades()
         self.stdout.write(self.style.SUCCESS('Готово!'))
 
@@ -35,7 +37,6 @@ class Command(BaseCommand):
             ('09.03.03', 'Прикладная информатика'),
             ('09.03.04', 'Программная инженерия'),
         ]
-
         for code, name in data:
             obj, created = Specialty.objects.get_or_create(code=code, defaults={'name': name})
             self.stdout.write(f'Специальность {obj}: {"создана" if created else "уже есть"}')
@@ -46,7 +47,6 @@ class Command(BaseCommand):
             'Кафедра высшей математики',
             'Кафедра программной инженерии',
         ]
-
         for name in names:
             obj, created = Department.objects.get_or_create(name=name)
             self.stdout.write(f'Кафедра {obj}: {"создана" if created else "уже есть"}')
@@ -58,7 +58,7 @@ class Command(BaseCommand):
                 self.stdout.write(f'Семестр {obj}: {"создан" if created else "уже есть"}')
 
     def create_teachers(self):
-        departments = {department.name: department for department in Department.objects.all()}
+        departments = {d.name: d for d in Department.objects.all()}
 
         data = [
             ('Кузнецов', 'Андрей', 'Павлович', 'Кафедра информатики',
@@ -116,18 +116,19 @@ class Command(BaseCommand):
             self.stdout.write(f'Преподаватель {obj}: {"создан" if created else "уже есть"}')
 
     def create_groups(self):
-        specialties = {specialty.code: specialty for specialty in Specialty.objects.all()}
-        teachers = {teacher.last_name: teacher for teacher in Teacher.objects.all()}
+        specialties = {s.code: s for s in Specialty.objects.all()}
+        teachers = {t.last_name: t for t in Teacher.objects.all()}
 
+        # (название, код специальности, курс, год набора, фамилия куратора или None, форма обучения)
         data = [
-            ('ИВТ-24', '09.03.01', 3, 2024, 'Кузнецов'),
-            ('ИС-25', '09.03.02', 2, 2025, 'Смирнова'),
-            ('ПИ-25', '09.03.03', 2, 2025, 'Новикова'),
-            ('ПИ-24', '09.03.04', 3, 2024, 'Соколов'),
-            ('ИВТ-25', '09.03.01', 2, 2025, None),
+            ('ИВТ-24', '09.03.01', 3, 2024, 'Кузнецов', GroupStatus.FULL_TIME),
+            ('ИС-25', '09.03.02', 2, 2025, 'Смирнова', GroupStatus.FULL_TIME),
+            ('ПИ-25', '09.03.03', 2, 2025, 'Новикова', GroupStatus.PART_TIME),
+            ('ПИ-24', '09.03.04', 3, 2024, 'Соколов', GroupStatus.FULL_TIME),
+            ('ИВТ-25', '09.03.01', 2, 2025, None, GroupStatus.HYBRID_PROGRAM),
         ]
 
-        for name, specialty_code, course, admission_year, curator_name in data:
+        for name, specialty_code, course, admission_year, curator_name, mode_of_study in data:
             specialty = specialties[specialty_code]
             curator = teachers[curator_name] if curator_name else None
 
@@ -138,15 +139,15 @@ class Command(BaseCommand):
                     'course': course,
                     'admission_year': admission_year,
                     'curator': curator,
+                    'mode_of_study': mode_of_study,
                 },
             )
             self.stdout.write(f'Группа {obj}: {"создана" if created else "уже есть"}')
 
     def create_students(self):
-        groups = {group.name: group for group in Group.objects.all()}
+        groups = {g.name: g for g in Group.objects.all()}
 
         data = [
-            # ИВТ-24
             ('Иванов', 'Иван', 'Иванович', date(2006, 3, 14), Gender.MALE,
              'ivanov@student.ru', '+79101110001', 'ИВТ-24', EducationForm.BUDGET,
              date(2024, 9, 1), StudentStatus.STUDYING),
@@ -160,7 +161,6 @@ class Command(BaseCommand):
              'kuzmina@student.ru', '+79101110004', 'ИВТ-24', EducationForm.BUDGET,
              date(2024, 9, 1), StudentStatus.STUDYING),
 
-            # ИС-25
             ('Волков', 'Никита', 'Андреевич', date(2007, 4, 18), Gender.MALE,
              'volkov@student.ru', '+79101110005', 'ИС-25', EducationForm.CONTRACT,
              date(2025, 9, 1), StudentStatus.STUDYING),
@@ -174,7 +174,6 @@ class Command(BaseCommand):
              'belova@student.ru', '+79101110008', 'ИС-25', EducationForm.CONTRACT,
              date(2025, 9, 1), StudentStatus.EXPELLED),
 
-            # ПИ-25
             ('Комаров', 'Артём', 'Вячеславович', date(2007, 2, 9), Gender.MALE,
              'komarov@student.ru', '+79101110009', 'ПИ-25', EducationForm.BUDGET,
              date(2025, 9, 1), StudentStatus.STUDYING),
@@ -188,7 +187,6 @@ class Command(BaseCommand):
              'nikitina@student.ru', '+79101110012', 'ПИ-25', EducationForm.BUDGET,
              date(2025, 9, 1), StudentStatus.STUDYING),
 
-            # ПИ-24
             ('Захаров', 'Даниил', 'Игоревич', date(2006, 3, 19), Gender.MALE,
              'zaharov@student.ru', '+79101110013', 'ПИ-24', EducationForm.BUDGET,
              date(2024, 9, 1), StudentStatus.STUDYING),
@@ -202,7 +200,6 @@ class Command(BaseCommand):
              'guseva@student.ru', '+79101110016', 'ПИ-24', EducationForm.BUDGET,
              date(2024, 9, 1), StudentStatus.ACADEMIC_LEAVE),
 
-            # ИВТ-25
             ('Панов', 'Владислав', 'Николаевич', date(2007, 1, 15), Gender.MALE,
              'panov@student.ru', '+79101110017', 'ИВТ-25', EducationForm.BUDGET,
              date(2025, 9, 1), StudentStatus.STUDYING),
@@ -277,29 +274,24 @@ class Command(BaseCommand):
         semesters = {(s.start_year, s.number): s for s in Semester.objects.all()}
 
         data = [
-            # ИВТ-24
             ('Кузнецов', 'Программирование', 'ИВТ-24', 2024, 1),
             ('Смирнова', 'Базы данных', 'ИВТ-24', 2024, 1),
             ('Морозов', 'Высшая математика', 'ИВТ-24', 2024, 1),
 
-            # ИС-25
             ('Попов', 'Алгоритмы и структуры данных', 'ИС-25', 2025, 1),
             ('Новикова', 'Дискретная математика', 'ИС-25', 2025, 1),
             ('Васильева', 'Web-разработка', 'ИС-25', 2025, 1),
             ('Васильева', 'Английский язык', 'ИС-25', 2025, 1),
 
-            # ПИ-25
             ('Соколов', 'Объектно-ориентированное программирование', 'ПИ-25', 2025, 1),
             ('Фёдоров', 'Физика', 'ПИ-25', 2025, 1),
             ('Лебедева', 'Технологии программной инженерии', 'ПИ-25', 2025, 1),
 
-            # ПИ-24
             ('Егоров', 'Проектирование информационных систем', 'ПИ-24', 2024, 1),
             ('Соколов', 'Компьютерные сети', 'ПИ-24', 2024, 1),
             ('Новикова', 'Экономика', 'ПИ-24', 2024, 1),
             ('Егоров', 'Информационная безопасность', 'ПИ-24', 2024, 1),
 
-            # ИВТ-25
             ('Смирнова', 'Операционные системы', 'ИВТ-25', 2025, 1),
             ('Кузнецов', 'Программирование', 'ИВТ-25', 2025, 1),
             ('Морозов', 'Высшая математика', 'ИВТ-25', 2025, 1),
@@ -316,7 +308,7 @@ class Command(BaseCommand):
             )
             self.stdout.write(f'Преподавание {obj}: {"создано" if created else "уже есть"}')
 
-        # добираем оставшиеся дисциплины каждой группе, чтобы хватило записей на 200+ оценок
+        # добираем оставшиеся дисциплины каждой группе, чтобы было достаточно материала для оценок
         default_teacher = teachers['Кузнецов']
         for group in groups.values():
             semester = semesters[(group.admission_year, 1)]
@@ -329,19 +321,39 @@ class Command(BaseCommand):
                 )
                 self.stdout.write(f'Преподавание {obj}: {"создано" if created else "уже есть"}')
 
-    def create_grades(self):
-        grade_values = [
-            GradeStatus.TWO, GradeStatus.THREE, GradeStatus.FOUR, GradeStatus.FIVE,
+    def create_assignments(self):
+        template = [
+            ('Лабораторная №1', GradeType.LAB_ASSIGNMENT, 1, 1),
+            ('Лабораторная №2', GradeType.LAB_ASSIGNMENT, 1, 2),
+            ('Контрольная работа', GradeType.CONTROL_WORK, 3, 3),
+            ('Итоговая работа', GradeType.EXAM, 5, 4),
         ]
 
+        for teaching in Teaching.objects.all():
+            for title, grade_type, weight, order in template:
+                obj, created = Assignment.objects.get_or_create(
+                    teaching=teaching,
+                    title=title,
+                    defaults={
+                        'grade_type': grade_type,
+                        'weight': weight,
+                        'order': order,
+                    },
+                )
+        
+        self.stdout.write(f'Работа {obj}: {"создана" if created else "уже есть"}')
+
+    def create_grades(self):
+        grade_values = [GradeStatus.TWO, GradeStatus.THREE, GradeStatus.FOUR, GradeStatus.FIVE]
+
         count_created = 0
-        for teaching in Teaching.objects.select_related('group'):
-            students = Student.objects.filter(group=teaching.group)
+        for assignment in Assignment.objects.select_related('teaching__group'):
+            students = Student.objects.filter(group=assignment.teaching.group)
             for student in students:
                 value = random.choice(grade_values)
                 obj, created = Grade.objects.get_or_create(
                     student=student,
-                    teaching=teaching,
+                    assignment=assignment,
                     defaults={'value': value},
                 )
                 if created:

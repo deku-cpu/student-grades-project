@@ -1,7 +1,7 @@
 const FORM_LABELS = {
     'full-time': 'Очная',
     'part-time': 'Заочная',
-    'distance_learning': 'Дистанционная'
+    'hybrid-program': 'Очно-заочная'
 };
 
 const GROUPS_COLUMNS = [
