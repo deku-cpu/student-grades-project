@@ -323,10 +323,10 @@ class Command(BaseCommand):
 
     def create_assignments(self):
         template = [
-            ('Лабораторная №1', GradeType.LAB_ASSIGNMENT, 1, 1),
-            ('Лабораторная №2', GradeType.LAB_ASSIGNMENT, 1, 2),
-            ('Контрольная работа', GradeType.CONTROL_WORK, 3, 3),
-            ('Итоговая работа', GradeType.EXAM, 5, 4),
+            ('Лабораторная №1', GradeType.INTERMEDIATE, 1, 1),
+            ('Лабораторная №2', GradeType.INTERMEDIATE, 1, 2),
+            ('Контрольная работа', GradeType.INTERMEDIATE, 3, 3),
+            ('Итоговая работа', GradeType.FINAL, 5, 4),
         ]
 
         for teaching in Teaching.objects.all():

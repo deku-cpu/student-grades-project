@@ -1,5 +1,5 @@
 const MENU = {
-  dean: [
+  deans_office: [
     { title: "Студенты", url: "..." },
     { title: "Группы", url: "..." },
     { title: "Дисциплины", url: "..." }
