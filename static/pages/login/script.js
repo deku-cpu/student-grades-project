@@ -1,8 +1,10 @@
 // --- Переключатель видимости пароля ---
 const passwordInput = document.getElementById('password');
-const passwordConfirmToggle = document.getElementById('passwordConfirmToggle');
 
- 
+// В HTML, который ты присылал, нет элемента с id="passwordConfirmToggle", 
+// поэтому я убрал эту строку, чтобы не было ошибки в консоли.
+// const passwordConfirmToggle = document.getElementById('passwordConfirmToggle'); 
+
 const eyeIcon = document.getElementById('eyeIcon');
 
 const eyeOpenPath = `
@@ -17,64 +19,101 @@ const eyeClosedPath = `
 
 const eyeToggle = document.getElementById('eyeToggle');
 
-eyeToggle.addEventListener('click', () => {
-  changeInputView(passwordInput);
-});
+if (eyeToggle) {
+    eyeToggle.addEventListener('click', () => {
+        changeInputView(passwordInput);
+    });
+}
 
 function changeInputView(input) {
-  const isPassword = input.type === 'password';
-  input.type = isPassword ? 'text' : 'password';
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    // Добавил смену иконки, чтобы "глазик" зачеркивался/раскрывался
+    eyeIcon.innerHTML = isPassword ? eyeClosedPath : eyeOpenPath;
 }
 
 // --- Подсветка карточки, следующая за курсором (hover-эффект) ---
 const card = document.getElementById('card');
 const glow = document.getElementById('cardGlow');
 
-card.addEventListener('mousemove', (e) => {
-  const rect = card.getBoundingClientRect();
-  const x = ((e.clientX - rect.left) / rect.width) * 100;
-  const y = ((e.clientY - rect.top) / rect.height) * 100;
-  glow.style.setProperty('--mx', `${x}%`);
-  glow.style.setProperty('--my', `${y}%`);
-});
+if (card && glow) {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        glow.style.setProperty('--mx', `${x}%`);
+        glow.style.setProperty('--my', `${y}%`);
+    });
 
-// Подсвечиваем карточку и когда фокус внутри неё (клавиатура, без мыши)
-const focusableFields = card.querySelectorAll('input');
-focusableFields.forEach((field) => {
-  field.addEventListener('focus', () => card.classList.add('focus-within'));
-  field.addEventListener('blur', () => card.classList.remove('focus-within'));
-});
+    // Подсвечиваем карточку и когда фокус внутри неё
+    const focusableFields = card.querySelectorAll('input');
+    focusableFields.forEach((field) => {
+        field.addEventListener('focus', () => card.classList.add('focus-within'));
+        field.addEventListener('blur', () => card.classList.remove('focus-within'));
+    });
+}
 
+// --- Отправка формы (Вход) ---
 const form = document.getElementById('loginForm');
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+if (form) {
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-  const email = document.getElementById('email').value;
-  const password = passwordInput.value;
+        const email = document.getElementById('email').value;
+        const password = passwordInput.value;
 
-  const response = await fetch('/api/login/', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: email, password: password }),
-    credentials: 'include',
-  });
+        try {
+            const response = await fetch('/api/login/', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    // Передаем CSRF токен. Это хорошая практика, даже если 
+                    // сейчас в api.py стоит @csrf_exempt
+                    'X-CSRFToken': getCookie('csrftoken') 
+                },
+                body: JSON.stringify({ username: email, password: password }),
+                credentials: 'include', // Важно для сохранения сессии Django
+            });
 
-  const data = await response.json();
+            const data = await response.json();
 
-  localStorage.setItem('role', data.role);
+            if (response.ok) {
+                // Сохраняем роль только если логин успешен
+                localStorage.setItem('role', data.role);
+                
+                if (data.role === 'student') {
+                    window.location.href = '/static/pages/grades/roles/student/diary/diary.html';
+                } else if (data.role === 'teacher') {
+                    window.location.href = '/static/pages/grades/roles/teacher/journal/journal.html';
+                } else if (data.role === 'deans_office') {
+                    window.location.href = '/static/pages/grades/roles/dekan/journal/journal.html';
+                } else {
+                    window.location.href = '/admin/';
+                }
+            } else {
+                // Обработка ошибки (например, неверный пароль)
+                alert(data.error || 'Ошибка входа');
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Не удалось связаться с сервером. Проверьте подключение.');
+        }
+    });
+}
 
-  if (response.ok) {
-    if (data.role === 'student') {
-      window.location.href = '/static/pages/grades/roles/student/diary/diary.html';
-    } else if (data.role === 'teacher') {
-      window.location.href = '/static/pages/grades/roles/teacher/journal/journal.html';
-    } else if (data.role === 'deans_office') {
-      window.location.href = '/static/pages/grades/roles/dekan/journal/journal.html';
-    } else {
-      window.location.href = '/admin/';
+// --- Вспомогательная функция для получения CSRF токена из куки ---
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
     }
-  } else {
-    alert(data.error);
-  }
-});
+    return cookieValue;
+}

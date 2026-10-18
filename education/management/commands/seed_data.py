@@ -2,6 +2,7 @@ import random
 from datetime import date
 
 from django.core.management.base import BaseCommand
+from django.core.management import call_command    
 
 from education.models import (
     Specialty, Department, Semester, Teacher, Group,
@@ -10,7 +11,7 @@ from education.models import (
 from education.choices import (
     PositionStatus, AcademicDegreeStatus, Gender,
     EducationForm, StudentStatus, ControlForm, GradeStatus,
-    GroupStatus, GradeType,
+    GroupStatus, GradeType
 )
 
 
@@ -28,6 +29,7 @@ class Command(BaseCommand):
         self.create_teaching()
         self.create_assignments()
         self.create_grades()
+        call_command('create_accounts')
         self.stdout.write(self.style.SUCCESS('Готово!'))
 
     def create_specialties(self):

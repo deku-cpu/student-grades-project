@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Сайт{% endblock %}</title>
+
+    {# Общие стили из папки shared #}
+    <link rel="stylesheet" href="{% static 'shared/base.css' %}">
+    <link rel="stylesheet" href="{% static 'shared/components.css' %}">
+    
+    {# Сюда страницы будут подключать свои стили (например, из pages/...) #}
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <header id="header">
+        <div class="header__inner">
+            <a href="/" class="header__logo">Сайт</a>
+
+            <nav class="header__nav">
+                <a href="/" class="header__link">Главная</a>
+            </nav>
+
+            <button id="logoutBtn" class="btn btn--secondary">Выйти</button>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer id="footer">
+        <p>Сделано студенческой группой</p>
+    </footer>
+    <script src="{% static 'shared/base.js' %}"></script>
+    {# Сюда страницы будут подключать свои скрипты #}
+    {% block extra_js %}
+    {% endblock %}
+</body>
+
+</html>
+
