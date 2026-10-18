@@ -12,6 +12,15 @@ api_urlpatterns = [
     path('groups/<int:group_id>/', api.group_detail_api, name='api_group_detail'),
     path('journal/<int:teaching_id>/', api.journal_api, name='journal_api'),
     path('journal/grade/', api.grades_api, name='grade_api'),
+    path('students/', api.students_api, name='students_api'),
+    path('students/<int:student_id>/', api.student_detail_api, name='student_detail_api'),
+    path('teachers/', api.teachers_api, name='teachers_api'),
+    path('teachers/<int:teacher_id>/', api.teacher_detail_api, name='teacher_detail_api'),
+    path('teachings/', api.teachings_api, name='teachings_api'),
+    path('teachings/<int:teaching_id>/', api.teaching_detail_api, name='teaching_detail_api'),
+    path('teachings/<int:teaching_id>/assignments/', api.assignments_api, name='assignments_api'),
+    path('assignments/<int:assignment_id>/', api.assignment_detail_api, name='assignment_detail_api'),
+    path('student/diary/', api.student_diary_api, name='student_diary_api'),
 ]
 
 urlpatterns = [
@@ -19,4 +28,9 @@ urlpatterns = [
     path('login/', views.login_page, name='login'),
     path('groups/', views.groups_page),
     path('teacher/disciplines/', views.teacher_disciplines_page, name='teacher_disciplines_page'),
+    path('students/', views.students_page, name='students_page'),
+    path('teachers/', views.teachers_page, name='teachers_page'),
+    path('teachings/', views.teachings_page, name='teachings_page'),
+    path('teachings/<int:teaching_id>/assignments/', views.assignments_page, name='assignments_page'),
+    path('student/diary/', views.student_diary_page, name='student_diary_page'),
 ]

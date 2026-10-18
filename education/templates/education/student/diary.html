@@ -1,0 +1,30 @@
+{% extends 'education/base.html' %}
+{% load static %}
+
+{% block title %}Мой дневник{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'pages/student/diary/style.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h1>Мой дневник успеваемости</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Дисциплина</th>
+                <th>Преподаватель</th>
+                <th>Оценки</th>
+                <th>Итог</th>
+            </tr>
+        </thead>
+        <tbody id="diary-body">
+            <!-- Сюда JS вставит данные -->
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'pages/student/diary/script.js' %}"></script>
+{% endblock %}

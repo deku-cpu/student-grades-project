@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 import json
 from django.db.models import Count, Q 
 
-from .models import Group, Student, Specialty, Teaching, Assignment, Grade 
+from .models import Group, Student, Specialty, Teaching, Assignment, Grade, Teacher, Department,Discipline, Semester
 
 def speciality_api(request):
 
@@ -266,3 +266,391 @@ def grades_api(request):
             return JsonResponse({'error': str(e)}, status=400)
 
     return JsonResponse({'error': 'Метод не поддерживается'}, status=405)
+
+@csrf_exempt
+def students_api(request):
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Не авторизован'}, status=401)
+        
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role not in ['deans_office']:
+        return JsonResponse({'error': 'Нет прав'}, status=403)
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            group = Group.objects.get(id=data.get('group_id')) if data.get('group_id') else None
+            
+            Student.objects.create(
+                last_name=data['last_name'],
+                first_name=data['first_name'],
+                middle_name=data['middle_name'],
+                date_of_birth=data['date_of_birth'],
+                gender=data['gender'],
+                email=data['email'],
+                phone_number=data['phone_number'],
+                group=group,
+                education_form=data['education_form'],
+                admission_date=data['admission_date'],
+                status=data['status']
+            )
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    students = Student.objects.select_related('group').all()
+
+    search = request.GET.get('search')
+    if search:
+        students = students.filter(
+            Q(last_name__icontains=search) | 
+            Q(first_name__icontains=search) | 
+            Q(middle_name__icontains=search)
+        )
+
+    group_id = request.GET.get('group')
+    if group_id:
+        students = students.filter(group_id=group_id)
+
+    form_query = request.GET.get('form')
+    if form_query:
+        students = students.filter(education_form=form_query)
+
+    status_query = request.GET.get('status')
+    if status_query:
+        students = students.filter(status=status_query)
+
+    students_data = []
+    for s in students:
+        students_data.append({
+            'id': s.id,
+            'full_name': f"{s.last_name} {s.first_name} {s.middle_name}",
+            'last_name': s.last_name,
+            'first_name': s.first_name,
+            'middle_name': s.middle_name,
+            'date_of_birth': s.date_of_birth.strftime('%Y-%m-%d') if s.date_of_birth else '',
+            'gender': s.gender,
+            'email': s.email,
+            'phone_number': s.phone_number,
+            'group_id': s.group.id if s.group else '',
+            'group_name': s.group.name if s.group else 'Нет',
+            'education_form': s.education_form,
+            'admission_date': s.admission_date.strftime('%Y-%m-%d') if s.admission_date else '',
+            'status': s.status
+        })
+
+    return JsonResponse(students_data, safe=False)
+
+
+@csrf_exempt
+def student_detail_api(request, student_id):
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Не авторизован'}, status=401)
+        
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role not in ['deans_office']:
+        return JsonResponse({'error': 'Нет прав'}, status=403)
+
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            s = Student.objects.get(id=student_id)
+            group = Group.objects.get(id=data.get('group_id')) if data.get('group_id') else None
+            
+            s.last_name = data['last_name']
+            s.first_name = data['first_name']
+            s.middle_name = data['middle_name']
+            s.date_of_birth = data['date_of_birth']
+            s.gender = data['gender']
+            s.email = data['email']
+            s.phone_number = data['phone_number']
+            s.group = group
+            s.education_form = data['education_form']
+            s.admission_date = data['admission_date']
+            s.status = data['status']
+            s.save()
+            
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    elif request.method == 'DELETE':
+        try:
+            Student.objects.get(id=student_id).delete()
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+
+
+
+@csrf_exempt
+def teachers_api(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            dept = Department.objects.get(id=data.get('department_id')) if data.get('department_id') else None
+            
+            Teacher.objects.create(
+                last_name=data['last_name'],
+                first_name=data['first_name'],
+                middle_name=data['middle_name'],
+                department=dept,
+                position=data['position'],
+                academic_degree=data['academic_degree'],
+                email=data['email'],
+                phone_number=data['phone_number']
+            )
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    teachers = Teacher.objects.select_related('department').all()
+
+    search = request.GET.get('search')
+    if search:
+        teachers = teachers.filter(
+            Q(last_name__icontains=search) | 
+            Q(first_name__icontains=search) | 
+            Q(middle_name__icontains=search)
+        )
+
+    dept_id = request.GET.get('department')
+    if dept_id:
+        teachers = teachers.filter(department_id=dept_id)
+
+    position = request.GET.get('position')
+    if position:
+        teachers = teachers.filter(position=position)
+
+    teachers_data = []
+    for t in teachers:
+        teachers_data.append({
+            'id': t.id,
+            'full_name': f"{t.last_name} {t.first_name} {t.middle_name}",
+            'last_name': t.last_name,
+            'first_name': t.first_name,
+            'middle_name': t.middle_name,
+            'department_id': t.department.id if t.department else '',
+            'department_name': t.department.name if t.department else 'Нет',
+            'position': t.position,
+            'academic_degree': t.academic_degree,
+            'email': t.email,
+            'phone_number': t.phone_number
+        })
+
+    return JsonResponse(teachers_data, safe=False)
+
+
+@csrf_exempt
+def teacher_detail_api(request, teacher_id):
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            t = Teacher.objects.get(id=teacher_id)
+            dept = Department.objects.get(id=data.get('department_id')) if data.get('department_id') else None
+            
+            t.last_name = data['last_name']
+            t.first_name = data['first_name']
+            t.middle_name = data['middle_name']
+            t.department = dept
+            t.position = data['position']
+            t.academic_degree = data['academic_degree']
+            t.email = data['email']
+            t.phone_number = data['phone_number']
+            t.save()
+            
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    elif request.method == 'DELETE':
+        try:
+            Teacher.objects.get(id=teacher_id).delete()
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)        
+
+
+
+
+@csrf_exempt
+def teachings_api(request):
+    # СОЗДАНИЕ
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            group = Group.objects.get(id=data.get('group_id'))
+            discipline = Discipline.objects.get(id=data.get('discipline_id'))
+            teacher = Teacher.objects.get(id=data.get('teacher_id'))
+            semester = Semester.objects.get(id=data.get('semester_id'))
+            
+            Teaching.objects.create(
+                group=group, discipline=discipline, teacher=teacher, semester=semester
+            )
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    # ЧТЕНИЕ (СПИСОК)
+    teachings = Teaching.objects.select_related('group', 'discipline', 'teacher', 'semester').all()
+
+    search = request.GET.get('search')
+    if search:
+        teachings = teachings.filter(
+            Q(group__name__icontains=search) | Q(discipline__name__icontains=search)
+        )
+
+    data = []
+    for t in teachings:
+        data.append({
+            'id': t.id,
+            'group_id': t.group.id,
+            'group_name': t.group.name,
+            'discipline_id': t.discipline.id,
+            'discipline_name': t.discipline.name,
+            'teacher_id': t.teacher.id,
+            'teacher_name': f"{t.teacher.last_name} {t.teacher.first_name[0]}.{t.teacher.middle_name[0]}.",
+            'semester_id': t.semester.id,
+            'semester_name': str(t.semester),
+        })
+    return JsonResponse(data, safe=False)
+
+
+@csrf_exempt
+def teaching_detail_api(request, teaching_id):
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            t = Teaching.objects.get(id=teaching_id)
+            t.group = Group.objects.get(id=data.get('group_id'))
+            t.discipline = Discipline.objects.get(id=data.get('discipline_id'))
+            t.teacher = Teacher.objects.get(id=data.get('teacher_id'))
+            t.semester = Semester.objects.get(id=data.get('semester_id'))
+            t.save()
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    elif request.method == 'DELETE':
+        try:
+            Teaching.objects.get(id=teaching_id).delete()
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+
+
+
+
+@csrf_exempt
+def assignments_api(request, teaching_id):
+    # СОЗДАНИЕ
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            teaching = Teaching.objects.get(id=teaching_id)
+            
+            Assignment.objects.create(
+                teaching=teaching,
+                title=data['title'],
+                grade_type=data['grade_type'],
+                weight=data.get('weight', 1),
+                order=data.get('order', 0),
+                date=data.get('date') or None
+            )
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    # ЧТЕНИЕ (СПИСОК заданий для конкретной пары)
+    assignments = Assignment.objects.filter(teaching_id=teaching_id).order_by('order')
+    
+    data = []
+    for a in assignments:
+        data.append({
+            'id': a.id,
+            'title': a.title,
+            'grade_type': a.grade_type,
+            'weight': a.weight,
+            'order': a.order,
+            'date': a.date.strftime('%Y-%m-%d') if a.date else ''
+        })
+    return JsonResponse(data, safe=False)
+
+
+@csrf_exempt
+def assignment_detail_api(request, assignment_id):
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            a = Assignment.objects.get(id=assignment_id)
+            a.title = data['title']
+            a.grade_type = data['grade_type']
+            a.weight = data.get('weight', 1)
+            a.order = data.get('order', 0)
+            a.date = data.get('date') or None
+            a.save()
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    elif request.method == 'DELETE':
+        try:
+            Assignment.objects.get(id=assignment_id).delete()
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+
+
+def student_diary_api(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Не авторизован'}, status=401)
+
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role != 'student':
+        return JsonResponse({'error': 'Доступ только для студентов'}, status=403)
+
+    # Берем профиль студента (связь user -> student_profile)
+    student = request.user.student_profile
+
+    if not student.group:
+        return JsonResponse({'error': 'Вы не привязаны к группе'}, status=400)
+
+    # Ищем все пары для его группы
+    teachings = Teaching.objects.filter(group=student.group).select_related('discipline', 'teacher')
+
+    data = []
+    for t in teachings:
+        # Все задания для этой пары
+        assignments = Assignment.objects.filter(teaching=t).order_by('order')
+        
+        # Оценки студента по этим заданиям
+        grades = Grade.objects.filter(student=student, assignment__in=assignments)
+        grade_dict = {g.assignment_id: g.value for g in grades}
+
+        # Считаем итоговую оценку
+        total_score = 0
+        total_weight = 0
+        for a in assignments:
+            val = grade_dict.get(a.id)
+            # Проверяем, что оценка есть и это число (чтобы не упасть на 'pass')
+            if val and str(val).isdigit():
+                total_score += int(val) * a.weight
+                total_weight += a.weight
+
+        final_grade = round(total_score / total_weight, 2) if total_weight > 0 else '—'
+
+        data.append({
+            'teaching_id': t.id,
+            'discipline': t.discipline.name,
+            'teacher': f"{t.teacher.last_name} {t.teacher.first_name[0]}.{t.teacher.middle_name[0]}.",
+            'assignments': [{'id': a.id, 'title': a.title} for a in assignments],
+            'grades': grade_dict,
+            'final_grade': final_grade
+        })
+
+    return JsonResponse(data, safe=False)
