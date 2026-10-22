@@ -9,34 +9,35 @@
 
 {% block content %}
     <h1>Список преподавателей</h1>
-    
-    <div class="field">
-        <label for="filterName">Поиск по ФИО</label>
-        <input id="filterName"> 
-    </div>
+    <div class = "toolbar">
+        <div class="field">
+            <label for="filterName">Поиск по ФИО</label>
+            <input id="filterName"> 
+        </div>
 
-    <button class="btn btn--primary" id="addTeacherBtn">Добавить преподавателя</button>
-
-    <div class="field"> 
-        <label for="filterDepartment">Кафедра</label>
-        <select id="filterDepartment">
-            <option value=''>Все кафедры</option>
-            {% for dept in departments %}
-                <option value="{{ dept.id }}">{{ dept.name }}</option>
-            {% endfor %}
-        </select>
+        <div class="field"> 
+            <label for="filterDepartment">Кафедра</label>
+            <select id="filterDepartment">
+                <option value=''>Все кафедры</option>
+                {% for dept in departments %}
+                    <option value="{{ dept.id }}">{{ dept.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="field"> 
+            <label for="filterPosition">Должность</label>
+            <select id="filterPosition">
+                <option value=''>Все должности</option>
+                {% for value, label in positions %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <button class="btn btn--primary" id="addTeacherBtn">Добавить преподавателя</button>
+        
     </div>
-    
-    <div class="field"> 
-        <label for="filterPosition">Должность</label>
-        <select id="filterPosition">
-            <option value=''>Все должности</option>
-            {% for value, label in positions %}
-                <option value="{{ value }}">{{ label }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
     <table>
         <thead>        
             <tr>       

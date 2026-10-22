@@ -32,7 +32,7 @@ function changeInputView(input) {
     eyeIcon.innerHTML = isPassword ? eyeClosedPath : eyeOpenPath;
 }
 
-// --- Подсветка карточки, следующая за курсором (hover-эффект) ---
+//  Подсветка карточки, следующая за курсором
 const card = document.getElementById('card');
 const glow = document.getElementById('cardGlow');
 
@@ -53,7 +53,7 @@ if (card && glow) {
     });
 }
 
-// --- Отправка формы (Вход) ---
+// Отправка формы 
 const form = document.getElementById('loginForm');
 
 if (form) {
@@ -82,15 +82,8 @@ if (form) {
                 // Сохраняем роль только если логин успешен
                 localStorage.setItem('role', data.role);
                 
-                if (data.role === 'student') {
-                    window.location.href = '/static/pages/grades/roles/student/diary/diary.html';
-                } else if (data.role === 'teacher') {
-                    window.location.href = '/static/pages/grades/roles/teacher/journal/journal.html';
-                } else if (data.role === 'deans_office') {
-                    window.location.href = '/static/pages/grades/roles/dekan/journal/journal.html';
-                } else {
-                    window.location.href = '/admin/';
-                }
+                window.location.href = '/home/';
+                
             } else {
                 // Обработка ошибки (например, неверный пароль)
                 alert(data.error || 'Ошибка входа');
@@ -102,7 +95,7 @@ if (form) {
     });
 }
 
-// --- Вспомогательная функция для получения CSRF токена из куки ---
+//  Вспомогательная функция для получения CSRF токена из куки 
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {

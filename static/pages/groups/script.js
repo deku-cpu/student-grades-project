@@ -35,9 +35,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 let g = groups[i]; // Берем одну группу
                 
                 // Создаем кнопки 
-                let buttons = '<button onclick="journalGroup(' + g.id + ')" class="btn btn--secondary">Журнал</button> ' +
-                              '<button onclick="editGroup(' + g.id + ')" class="btn btn--secondary">Ред.</button> ' +
+                let buttons = '<button onclick="editGroup(' + g.id + ')" class="btn btn--secondary">Ред.</button> ' +
                               '<button onclick="deleteGroup(' + g.id + ')" class="btn btn--secondary">Удалить</button>';
+                              
 
                 // Лепим строчку для таблицы
                 let row = '<tr>' +
@@ -55,11 +55,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 tableBody.innerHTML += row;
             }
         });
-    }
-
-    window.journalGroup = function(id){
-        //группу из списка
-        window.location.href = '/groups/' + id + '/journal/';
     }
 
     // (эта функция при "Ред.")

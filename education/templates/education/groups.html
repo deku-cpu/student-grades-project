@@ -10,50 +10,51 @@
 {% block content %}
     <h1>Список групп</h1>
     
-    <div class="field">
-        <label for="filterName">Поиск по названию</label>
-        <input id="filterName"> 
-    </div>
+    <div class = "toolbar">
+        <div class="field">
+            <label for="filterName">Поиск по названию</label>
+            <input id="filterName"> 
+        </div>
 
-    
-    {% if request.user.profile.role == 'deans_office' or request.user.is_superuser %}
+        
+        
+        <div class="field"> 
+            <label for="filterYearOfStudy">Номер курса</label>
+            <select id="filterYearOfStudy">
+                <option value=''>Все курсы</option>
+                
+                {% for course in courses %}
+                    <option value="{{ course }}">{{ course }} курс</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="field"> 
+            <label for="filterEduForm">Вид обучения</label>
+            <select id="filterEduForm">
+                <option value=''>Все виды обучения</option>
+                
+                {% for value, label in group_modes %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="filterSpecialization">Специальность</label>
+            <select id="filterSpecialization" name="specialization">
+                <option value=''>Все специальности</option>
+                {% for spec in specialties %}
+                    <option value="{{spec.id}}">{{spec.code}} - {{spec.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
         <button class="btn btn--primary" id="addGroupBtn">
             Добавить группу
         </button>
-    {% endif %}
 
-    <div class="field"> 
-        <label for="filterYearOfStudy">Номер курса</label>
-        <select id="filterYearOfStudy">
-            <option value=''>Все курсы</option>
-            
-            {% for course in courses %}
-                <option value="{{ course }}">{{ course }} курс</option>
-            {% endfor %}
-        </select>
     </div>
-    
-    <div class="field"> 
-        <label for="filterEduForm">Вид обучения</label>
-        <select id="filterEduForm">
-            <option value=''>Все виды обучения</option>
-            
-            {% for value, label in group_modes %}
-                <option value="{{ value }}">{{ label }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <div class="field">
-        <label for="filterSpecialization">Специальность</label>
-        <select id="filterSpecialization" name="specialization">
-            <option value=''>Все специальности</option>
-            {% for spec in specialties %}
-                <option value="{{spec.id}}">{{spec.code}} - {{spec.name}}</option>
-            {% endfor %}
-        </select>
-    </div>
-
     <table>
         <thead>        
             <tr>       

@@ -9,44 +9,45 @@
 
 {% block content %}
     <h1>Список студентов</h1>
+    <div class = "toolbar">
+        <div class="field">
+            <label for="filterName">Поиск по ФИО</label>
+            <input id="filterName"> 
+        </div>
+
+        <div class="field"> 
+            <label for="filterGroup">Группа</label>
+            <select id="filterGroup">
+                <option value=''>Все группы</option>
+                {% for g in groups %}
+                    <option value="{{ g.id }}">{{ g.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="field"> 
+            <label for="filterForm">Форма обучения</label>
+            <select id="filterForm">
+                <option value=''>Все формы</option>
+                {% for value, label in education_forms %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field"> 
+            <label for="filterStatus">Статус</label>
+            <select id="filterStatus">
+                <option value=''>Все статусы</option>
+                {% for value, label in statuses %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button class="btn btn--primary" id="addStudentBtn">Добавить студента</button>
     
-    <div class="field">
-        <label for="filterName">Поиск по ФИО</label>
-        <input id="filterName"> 
-    </div>
-
-    <button class="btn btn--primary" id="addStudentBtn">Добавить студента</button>
-
-    <div class="field"> 
-        <label for="filterGroup">Группа</label>
-        <select id="filterGroup">
-            <option value=''>Все группы</option>
-            {% for g in groups %}
-                <option value="{{ g.id }}">{{ g.name }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    
-    <div class="field"> 
-        <label for="filterForm">Форма обучения</label>
-        <select id="filterForm">
-            <option value=''>Все формы</option>
-            {% for value, label in education_forms %}
-                <option value="{{ value }}">{{ label }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <div class="field"> 
-        <label for="filterStatus">Статус</label>
-        <select id="filterStatus">
-            <option value=''>Все статусы</option>
-            {% for value, label in statuses %}
-                <option value="{{ value }}">{{ label }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
+    </div>  
     <table>
         <thead>        
             <tr>       

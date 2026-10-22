@@ -272,3 +272,16 @@ th {
         padding: 16px;
     }
 }
+
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--gap-lg);
+    margin-bottom: var(--gap-xl);
+}
+
+.toolbar .btn {
+    margin-left: auto; /* прижимает кнопку вправо */
+}

@@ -1,0 +1,23 @@
+{% extends 'education/base.html' %}
+{% load static %}
+
+{% block title %}Главная{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'pages/home/style.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h1 class="home-title">Доступные разделы</h1>
+
+    <div class="home-cards">
+        {% for card in cards %}
+            <a href="{% url card.1 %}" class="home-card">
+                <span class="home-card__title">{{ card.0 }}</span>
+                <span class="home-card__desc">{{ card.2 }}</span>
+            </a>
+        {% empty %}
+            <p class="home-empty">Для вашей роли пока нет доступных разделов.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

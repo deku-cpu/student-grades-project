@@ -21,16 +21,20 @@ api_urlpatterns = [
     path('teachings/<int:teaching_id>/assignments/', api.assignments_api, name='assignments_api'),
     path('assignments/<int:assignment_id>/', api.assignment_detail_api, name='assignment_detail_api'),
     path('student/diary/', api.student_diary_api, name='student_diary_api'),
+    path('disciplines/', api.disciplines_api, name='disciplines_api'),
+    path('disciplines/<int:discipline_id>/', api.discipline_detail_api, name='discipline_detail_api'),
 ]
 
 urlpatterns = [
     path('journal/<int:teaching_id>/', views.journal_page, name='journal_page'),
-    path('login/', views.login_page, name='login'),
-    path('groups/', views.groups_page),
+    path('login/', views.login_page, name='login_page'),
+    path('groups/', views.groups_page, name = 'groups_page'),
     path('teacher/disciplines/', views.teacher_disciplines_page, name='teacher_disciplines_page'),
     path('students/', views.students_page, name='students_page'),
     path('teachers/', views.teachers_page, name='teachers_page'),
     path('teachings/', views.teachings_page, name='teachings_page'),
     path('teachings/<int:teaching_id>/assignments/', views.assignments_page, name='assignments_page'),
     path('student/diary/', views.student_diary_page, name='student_diary_page'),
+    path('home/', views.home, name='home'),
+    path('disciplines/', views.disciplines_page, name='disciplines_page'),
 ]

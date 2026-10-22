@@ -7,6 +7,7 @@ import json
 from django.db.models import Count, Q 
 
 from .models import Group, Student, Specialty, Teaching, Assignment, Grade, Teacher, Department,Discipline, Semester
+from .choices import UserRole
 
 def speciality_api(request):
 
@@ -26,7 +27,7 @@ def teacher_disciplines_api(request):
 
 
     profile = getattr(request.user, 'profile', None)
-    if not profile or profile.role != 'teacher':
+    if not profile or profile.role != UserRole.TEACHER:
         return JsonResponse({'error': 'Доступ только для преподавателей'}, status=403)
 
     teachings = Teaching.objects.filter(teacher__user=request.user).select_related('group', 'discipline')
@@ -84,13 +85,8 @@ def groups_api(request):
     if request.user.is_authenticated:
         profile = getattr(request.user, 'profile', None)
 
-        if profile and profile.role == 'student':
+        if profile and profile.role!=UserRole.DEANS_OFFICE:
             return JsonResponse({'error': 'Доступ ограничен'}, status=401, json_dumps_params={'ensure_ascii': False})
-        
-        if profile and profile.role == 'teacher':
-            groups = groups.filter(
-                Q(curator__user=request.user) | Q(teachings__teacher__user=request.user)
-            ).distinct()
 
     # Фильтры
     search_query = request.GET.get('search')
@@ -240,7 +236,7 @@ def grades_api(request):
             return JsonResponse({'error': 'Не авторизован'}, status=401)
             
         profile = getattr(request.user, 'profile', None)
-        if not profile or profile.role not in ['teacher', 'deans_office']:
+        if not profile or profile.role not in [UserRole.TEACHER, UserRole.DEANS_OFFICE]:
             return JsonResponse({'error': 'Нет прав на выставление оценок'}, status=403)
 
 
@@ -274,7 +270,7 @@ def students_api(request):
         return JsonResponse({'error': 'Не авторизован'}, status=401)
         
     profile = getattr(request.user, 'profile', None)
-    if not profile or profile.role not in ['deans_office']:
+    if not profile or profile.role not in [UserRole.DEANS_OFFICE]:
         return JsonResponse({'error': 'Нет прав'}, status=403)
 
     if request.method == 'POST':
@@ -350,7 +346,7 @@ def student_detail_api(request, student_id):
         return JsonResponse({'error': 'Не авторизован'}, status=401)
         
     profile = getattr(request.user, 'profile', None)
-    if not profile or profile.role not in ['deans_office']:
+    if not profile or profile.role not in [UserRole.DEANS_OFFICE]:
         return JsonResponse({'error': 'Нет прав'}, status=403)
 
     if request.method == 'PUT':
@@ -388,6 +384,15 @@ def student_detail_api(request, student_id):
 
 @csrf_exempt
 def teachers_api(request):
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Не авторизован'}, status=401)
+        
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role not in [UserRole.DEANS_OFFICE]:
+        return JsonResponse({'error': 'Нет прав'}, status=403)
+
+    
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
@@ -446,6 +451,16 @@ def teachers_api(request):
 
 @csrf_exempt
 def teacher_detail_api(request, teacher_id):
+
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Не авторизован'}, status=401)
+        
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role not in [UserRole.DEANS_OFFICE]:
+        return JsonResponse({'error': 'Нет прав'}, status=403)
+
+    
     if request.method == 'PUT':
         try:
             data = json.loads(request.body)
@@ -478,6 +493,15 @@ def teacher_detail_api(request, teacher_id):
 
 @csrf_exempt
 def teachings_api(request):
+
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Не авторизован'}, status=401)
+        
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role not in [UserRole.DEANS_OFFICE]:
+        return JsonResponse({'error': 'Нет прав'}, status=403)
+
     # СОЗДАНИЕ
     if request.method == 'POST':
         try:
@@ -521,6 +545,15 @@ def teachings_api(request):
 
 @csrf_exempt
 def teaching_detail_api(request, teaching_id):
+
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Не авторизован'}, status=401)
+        
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role not in [UserRole.DEANS_OFFICE]:
+        return JsonResponse({'error': 'Нет прав'}, status=403)
+
     if request.method == 'PUT':
         try:
             data = json.loads(request.body)
@@ -547,6 +580,22 @@ def teaching_detail_api(request, teaching_id):
 
 @csrf_exempt
 def assignments_api(request, teaching_id):
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Не авторизован'}, status=401)
+        
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role not in [UserRole.DEANS_OFFICE,UserRole.TEACHER]:
+        return JsonResponse({'error': 'Нет прав'}, status=403)
+
+    # Проверка что препод - учитель группы 
+    if profile.role == UserRole.TEACHER:
+        teaching = Teaching.objects.get(id=teaching_id)
+        teacher = getattr(request.user, 'teacher_profile', None)
+        if (teacher == None or teaching.teacher != teacher):
+            return JsonResponse({'error': 'Нет прав'}, status=403)
+
+
     # СОЗДАНИЕ
     if request.method == 'POST':
         try:
@@ -583,6 +632,15 @@ def assignments_api(request, teaching_id):
 
 @csrf_exempt
 def assignment_detail_api(request, assignment_id):
+
+    
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Не авторизован'}, status=401)
+        
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role not in [UserRole.DEANS_OFFICE,UserRole.TEACHER]:
+        return JsonResponse({'error': 'Нет прав'}, status=403)
+
     if request.method == 'PUT':
         try:
             data = json.loads(request.body)
@@ -611,10 +669,10 @@ def student_diary_api(request):
         return JsonResponse({'error': 'Не авторизован'}, status=401)
 
     profile = getattr(request.user, 'profile', None)
-    if not profile or profile.role != 'student':
-        return JsonResponse({'error': 'Доступ только для студентов'}, status=403)
+    if not profile or profile.role != UserRole.STUDENT:
+        return JsonResponse({'error': 'Нет прав'}, status=403)
 
-    # Берем профиль студента (связь user -> student_profile)
+
     student = request.user.student_profile
 
     if not student.group:
@@ -625,19 +683,18 @@ def student_diary_api(request):
 
     data = []
     for t in teachings:
-        # Все задания для этой пары
-        assignments = Assignment.objects.filter(teaching=t).order_by('order')
         
-        # Оценки студента по этим заданиям
+        assignments = Assignment.objects.filter(teaching=t).order_by('order')
+
+        
         grades = Grade.objects.filter(student=student, assignment__in=assignments)
         grade_dict = {g.assignment_id: g.value for g in grades}
 
-        # Считаем итоговую оценку
+
         total_score = 0
         total_weight = 0
         for a in assignments:
             val = grade_dict.get(a.id)
-            # Проверяем, что оценка есть и это число (чтобы не упасть на 'pass')
             if val and str(val).isdigit():
                 total_score += int(val) * a.weight
                 total_weight += a.weight
@@ -654,3 +711,92 @@ def student_diary_api(request):
         })
 
     return JsonResponse(data, safe=False)
+
+
+
+@csrf_exempt
+def disciplines_api(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Не авторизован'}, status=401, json_dumps_params={'ensure_ascii': False})
+
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role != UserRole.DEANS_OFFICE:
+        return JsonResponse({'error': 'Доступ ограничен'}, status=403, json_dumps_params={'ensure_ascii': False})
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            Discipline.objects.create(
+                name=data['name'],
+                description=data.get('description', ''),
+                hours_lecture=data.get('hours_lecture', 0),
+                hours_practice=data.get('hours_practice', 0),
+                hours_lab=data.get('hours_lab', 0),
+                control_form=data['control_form']
+            )
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400, json_dumps_params={'ensure_ascii': False})
+
+    # GET запрос (список)
+    disciplines = Discipline.objects.all()
+
+    # Фильтры
+    search_query = request.GET.get('search')
+    if search_query:
+        disciplines = disciplines.filter(name__icontains=search_query)
+        
+    control_query = request.GET.get('control_form')
+    if control_query:
+        disciplines = disciplines.filter(control_form=control_query)
+
+    # Формируем ответ
+    disciplines_data = []
+    for d in disciplines:
+        disciplines_data.append({
+            'id': d.id,
+            'name': d.name,
+            'description': d.description,
+            'hours_lecture': d.hours_lecture,
+            'hours_practice': d.hours_practice,
+            'hours_lab': d.hours_lab,
+            'control_form': d.control_form,
+        })
+
+    return JsonResponse(disciplines_data, safe=False)
+
+
+@csrf_exempt
+def discipline_detail_api(request, discipline_id=None):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Не авторизован'}, status=401, json_dumps_params={'ensure_ascii': False})
+
+    profile = getattr(request.user, 'profile', None)
+    if not profile or profile.role != UserRole.DEANS_OFFICE:
+        return JsonResponse({'error': 'Доступ ограничен'}, status=403, json_dumps_params={'ensure_ascii': False})
+
+    if request.method == 'PUT' and discipline_id:
+        try:
+            data = json.loads(request.body)
+            d = Discipline.objects.get(id=discipline_id)
+            
+            d.name = data['name']
+            d.description = data.get('description', '')
+            d.hours_lecture = data.get('hours_lecture', 0)
+            d.hours_practice = data.get('hours_practice', 0)
+            d.hours_lab = data.get('hours_lab', 0)
+            d.control_form = data['control_form']
+            d.save()
+            
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400, json_dumps_params={'ensure_ascii': False})
+
+    elif request.method == 'DELETE' and discipline_id:
+        try:
+            Discipline.objects.get(id=discipline_id).delete()
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400, json_dumps_params={'ensure_ascii': False})
+
+    return JsonResponse({'error': 'Метод не поддерживается'}, status=405)

@@ -60,3 +60,23 @@ def assignments_page(request, teaching_id):
 
 def student_diary_page(request):
     return render(request, 'education/student/diary.html')
+
+from .constants import MAIN_CARDS
+
+def home(request):
+    profile = getattr(request.user, 'profile', None)
+    role = profile.role if profile else None
+
+    cards = MAIN_CARDS.get(role, [])
+
+    # не пустые 
+    cards = [card for card in cards if card[1]]
+
+    return render(request, 'education/home.html', {'cards': cards})
+
+from .choices import ControlForm
+
+def disciplines_page(request):
+    return render(request, 'education/dean/disciplines.html', {
+        'control_forms': ControlForm.choices
+    })

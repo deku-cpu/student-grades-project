@@ -17,10 +17,9 @@
 
     <header id="header">
         <div class="header__inner">
-            <a href="/" class="header__logo">Сайт</a>
 
             <nav class="header__nav">
-                <a href="/" class="header__link">Главная</a>
+                <a href="{% url 'home' %}" class="header__link">Главная</a>
             </nav>
 
             <button id="logoutBtn" class="btn btn--secondary">Выйти</button>

@@ -30,7 +30,7 @@
   </div>
 
   <header class="topbar">
-    {# Укажи правильный путь к логотипу в папке static #}
+    
     <img src="{% static 'logo.jpg' %}" alt="Табель" class="brand-logo">
   </header>
 
@@ -69,14 +69,14 @@
           <a href="#" class="link">Забыли пароль?</a>
         </div>
 
-        {# Здесь как раз используются наши общие классы из components.css #}
+        
         <button type="submit" class="btn btn--primary">Войти</button>
         <button type="button" class="btn btn--secondary" id="registerBtn">Регистрация</button>
       </form>
     </div>
   </main>
 
-  {# Скрипт страницы тоже лучше хранить в static/pages/login/ #}
+  
   <script src="{% static 'pages/login/script.js' %}"></script>
 </body>
 </html>
