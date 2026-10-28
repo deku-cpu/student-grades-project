@@ -2,14 +2,16 @@ import random
 from datetime import date
 
 from django.core.management.base import BaseCommand
+from django.core.management import call_command    
 
 from education.models import (
     Specialty, Department, Semester, Teacher, Group,
-    Student, Discipline, Teaching, Grade,
+    Student, Discipline, Teaching, Assignment, Grade,
 )
 from education.choices import (
     PositionStatus, AcademicDegreeStatus, Gender,
     EducationForm, StudentStatus, ControlForm, GradeStatus,
+    GroupStatus, GradeType
 )
 
 
@@ -138,6 +140,7 @@ class Command(BaseCommand):
                     'course': course,
                     'admission_year': admission_year,
                     'curator': curator,
+                    'mode_of_study': mode_of_study,
                 },
             )
             self.stdout.write(f'Группа {obj}: {"создана" if created else "уже есть"}')
@@ -316,7 +319,7 @@ class Command(BaseCommand):
             )
             self.stdout.write(f'Преподавание {obj}: {"создано" if created else "уже есть"}')
 
-        # добираем оставшиеся дисциплины каждой группе, чтобы хватило записей на 200+ оценок
+        # добираем оставшиеся дисциплины каждой группе, чтобы было достаточно материала для оценок
         default_teacher = teachers['Кузнецов']
         for group in groups.values():
             semester = semesters[(group.admission_year, 1)]
@@ -329,19 +332,39 @@ class Command(BaseCommand):
                 )
                 self.stdout.write(f'Преподавание {obj}: {"создано" if created else "уже есть"}')
 
-    def create_grades(self):
-        grade_values = [
-            GradeStatus.TWO, GradeStatus.THREE, GradeStatus.FOUR, GradeStatus.FIVE,
+    def create_assignments(self):
+        template = [
+            ('Лабораторная №1', GradeType.INTERMEDIATE, 1, 1),
+            ('Лабораторная №2', GradeType.INTERMEDIATE, 1, 2),
+            ('Контрольная работа', GradeType.INTERMEDIATE, 3, 3),
+            ('Итоговая работа', GradeType.FINAL, 5, 4),
         ]
 
+        for teaching in Teaching.objects.all():
+            for title, grade_type, weight, order in template:
+                obj, created = Assignment.objects.get_or_create(
+                    teaching=teaching,
+                    title=title,
+                    defaults={
+                        'grade_type': grade_type,
+                        'weight': weight,
+                        'order': order,
+                    },
+                )
+        
+        self.stdout.write(f'Работа {obj}: {"создана" if created else "уже есть"}')
+
+    def create_grades(self):
+        grade_values = [GradeStatus.TWO, GradeStatus.THREE, GradeStatus.FOUR, GradeStatus.FIVE]
+
         count_created = 0
-        for teaching in Teaching.objects.select_related('group'):
-            students = Student.objects.filter(group=teaching.group)
+        for assignment in Assignment.objects.select_related('teaching__group'):
+            students = Student.objects.filter(group=assignment.teaching.group)
             for student in students:
                 value = random.choice(grade_values)
                 obj, created = Grade.objects.get_or_create(
                     student=student,
-                    teaching=teaching,
+                    assignment=assignment,
                     defaults={'value': value},
                 )
                 if created:

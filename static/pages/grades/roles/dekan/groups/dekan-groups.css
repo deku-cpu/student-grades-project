@@ -1,0 +1,25 @@
+#groups-body {
+    margin-top: 24px;
+}
+
+#groups-body .empty {
+    padding: 24px;
+    text-align: center;
+    opacity: 0.6;
+}
+
+#groups-body table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#groups-body th,
+#groups-body td {
+    border: 1px solid #ddd;
+    padding: 6px 8px;
+    text-align: left;
+}
+
+#groups-body td:last-child {
+    white-space: nowrap;
+}

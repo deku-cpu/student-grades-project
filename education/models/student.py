@@ -17,6 +17,7 @@ class Student(models.Model):
     education_form = models.CharField(max_length=10, choices=EducationForm.choices)
     admission_date = models.DateField(default=date.today)
     status = models.CharField(max_length=20, choices=StudentStatus.choices, default=StudentStatus.STUDYING)
+    user = models.OneToOneField('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='student_profile')
 
     def __str__(self):
         return f'{self.last_name} {self.first_name} {self.middle_name}'

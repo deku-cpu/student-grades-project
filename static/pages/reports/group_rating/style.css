@@ -1,0 +1,11 @@
+#report h2 { margin: 0 0 var(--gap-lg); }
+.place-1 { font-weight: 700; color: #b8860b; }
+.place-2 { font-weight: 600; color: #6b7280; }
+.place-3 { font-weight: 600; color: #a16207; }
+
+@media print {
+    #header, #footer, .toolbar { display: none !important; }
+    main { padding: 0 !important; }
+    table { font-size: 11px; }
+    th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

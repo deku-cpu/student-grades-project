@@ -10,6 +10,7 @@ class Assignment(models.Model):
     grade_type = models.CharField(max_length=15, choices=GradeType.choices)
     weight = models.PositiveSmallIntegerField(default=0.1, validators=[MinValueValidator(0.1), MaxValueValidator(1)])
     order = models.PositiveSmallIntegerField(default=0)
+    date = models.DateField(null=True, blank=True)
 
     class Meta:
         constraints = [

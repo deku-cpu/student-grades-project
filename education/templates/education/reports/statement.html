@@ -1,0 +1,25 @@
+{% extends 'education/base.html' %}
+{% load static %}
+
+{% block title %}Ведомость по группе и дисциплине{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'pages/reports/statement/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Ведомость по группе и дисциплине</h1>
+
+<div class="toolbar">
+    <select id="teachingSelect" style="flex: 1;">
+        <option value="">— выберите пару —</option>
+    </select>
+    <button class="btn btn--primary" id="printBtn" disabled>Печать</button>
+</div>
+
+<div id="report"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'pages/reports/statement/script.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Табель ID — Вход</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+{# Подключаем общие стили, так как base.html не используем #}
+<link rel="stylesheet" href="{% static 'shared/base.css' %}">
+<link rel="stylesheet" href="{% static 'shared/components.css' %}">
+
+{# Стили конкретно этой страницы #}
+<link rel="stylesheet" href="{% static 'pages/login/style.css' %}">
+</head>
+<body>
+
+  <div class="bg">
+    <svg class="bg-graph" viewBox="0 0 1200 700" preserveAspectRatio="none" aria-hidden="true">
+      <polyline class="bg-graph-line bg-graph-line--1" points="0,560 140,520 260,540 380,430 500,460 620,340 740,380 860,260 980,300 1100,180 1200,210" />
+      <polyline class="bg-graph-line bg-graph-line--2" points="0,620 150,610 300,590 450,560 600,540 750,480 900,470 1050,400 1200,380" />
+      <g class="bg-graph-dots">
+        <circle cx="620" cy="340" r="4"></circle>
+        <circle cx="860" cy="260" r="4"></circle>
+        <circle cx="1100" cy="180" r="4"></circle>
+      </g>
+    </svg>
+  </div>
+
+  <header class="topbar">
+    
+    <img src="{% static 'logo.jpg' %}" alt="Табель" class="brand-logo">
+  </header>
+
+  <main class="card" id="card">
+    <div class="card__glow" id="cardGlow" aria-hidden="true"></div>
+
+    <div class="card__inner">
+      <h1 class="card__title">Табель ID</h1>
+      <p class="card__subtitle">Учёт успеваемости студентов</p>
+
+      <form class="form" id="loginForm" method="POST" novalidate>
+        {% csrf_token %}
+        
+        <div class="field">
+          <input type="email" id="email" name="email" placeholder=" " autocomplete="username" required>
+          <label for="email">E-mail</label>
+        </div>
+
+        <div class="field field--password">
+          <input type="password" id="password" name="password" placeholder=" " autocomplete="current-password" required>
+          <label for="password">Пароль</label>
+          <button type="button" class="eye" id="eyeToggle" aria-label="Показать пароль">
+            <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="row">
+          <label class="checkbox">
+            <input type="checkbox" id="remember" name="remember">
+            <span class="checkbox__box"></span>
+            <span class="checkbox__label">Запомнить меня</span>
+          </label>
+          <a href="#" class="link">Забыли пароль?</a>
+        </div>
+
+        
+        <button type="submit" class="btn btn--primary">Войти</button>
+        <button type="button" class="btn btn--secondary" id="registerBtn">Регистрация</button>
+      </form>
+    </div>
+  </main>
+
+  
+  <script src="{% static 'pages/login/script.js' %}"></script>
+</body>
+</html>

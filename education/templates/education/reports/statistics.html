@@ -1,0 +1,27 @@
+{% extends 'education/base.html' %}
+{% load static %}
+
+{% block title %}Статистика успеваемости{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'pages/reports/statistics/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Статистика успеваемости</h1>
+
+<div class="toolbar">
+    <select id="bySelect" style="flex: 1;">
+        <option value="group">По группам</option>
+        <option value="course">По курсам</option>
+        <option value="specialty">По специальностям</option>
+    </select>
+    <button class="btn btn--primary" id="printBtn">Печать</button>
+</div>
+
+<div id="report"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'pages/reports/statistics/script.js' %}"></script>
+{% endblock %}

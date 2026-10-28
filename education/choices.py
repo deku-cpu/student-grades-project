@@ -43,13 +43,16 @@ class GradeStatus(models.TextChoices):
     FAIL = 'fail', 'Незачет'
 
 class GroupStatus(models.TextChoices):
-    FULL_TIME = 'full_time', 'Очная'
-    PART_TIME = 'part_time', 'Заочная'
-    HYBRID_PROGRAM = 'hybrid_program', 'Очно-заочная'
+    FULL_TIME = 'full-time', 'Очная'
+    PART_TIME = 'part-time', 'Заочная'
+    HYBRID_PROGRAM = 'hybrid-program', 'Очно-заочная'
 
 class GradeType(models.TextChoices):
-    LAB_ASSIGNMENT = 'lab_assignment', 'Лабораторная'
-    CONTROL_WORK = 'control_work', 'Контрольная'
-    COURSE_WORK = 'course_work', 'Курсовая'
-    EXAM = 'exam', 'Экзамен'
-    CREDIT = 'credit', 'Зачет'
+    INTERMEDIATE = 'intermediate', 'Промежуточная оценка'
+    FINAL = 'final', 'Итоговая оценка'
+
+class UserRole(models.TextChoices):
+    ADMIN = 'admin', 'Администратор'
+    DEANS_OFFICE = 'deans_office', 'Деканат'
+    TEACHER = 'teacher', 'Преподаватель'
+    STUDENT = 'student', 'Студент'

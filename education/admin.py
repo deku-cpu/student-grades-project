@@ -62,3 +62,8 @@ class AssignmentAdmin(admin.ModelAdmin):
     list_filter = ('grade_type',)
     search_fields = ('title', 'teaching__discipline__name')
     autocomplete_fields = ('teaching',)
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'role')
+    list_filter = ('role',)
