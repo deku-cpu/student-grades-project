@@ -23,6 +23,13 @@ api_urlpatterns = [
     path('student/diary/', api.student_diary_api, name='student_diary_api'),
     path('disciplines/', api.disciplines_api, name='disciplines_api'),
     path('disciplines/<int:discipline_id>/', api.discipline_detail_api, name='discipline_detail_api'),
+
+    path('reports/statement/',       views.report_statement_api,       name='report_statement_api'),
+    path('reports/student-summary/', views.report_student_summary_api, name='report_student_summary_api'),
+    path('reports/group-rating/',    views.report_group_rating_api,    name='report_group_rating_api'),
+    path('reports/debtors/',         views.report_debtors_api,         name='report_debtors_api'),
+    path('reports/statistics/',      views.report_statistics_api,      name='report_statistics_api'),
+    path('reports/quality/',         views.report_quality_api,         name='report_quality_api'),
 ]
 
 urlpatterns = [
@@ -37,4 +44,12 @@ urlpatterns = [
     path('student/diary/', views.student_diary_page, name='student_diary_page'),
     path('home/', views.home, name='home'),
     path('disciplines/', views.disciplines_page, name='disciplines_page'),
+
+
+    path('reports/statement/',       views.report_statement_page,       name='report_statement_page'),
+    path('reports/student-summary/', views.report_student_summary_page, name='report_student_summary_page'),
+    path('reports/group-rating/',    views.report_group_rating_page,    name='report_group_rating_page'),
+    path('reports/debtors/',         views.report_debtors_page,         name='report_debtors_page'),
+    path('reports/statistics/',      views.report_statistics_page,      name='report_statistics_page'),
+    path('reports/quality/',         views.report_quality_page,         name='report_quality_page'),
 ]

@@ -800,3 +800,315 @@ def discipline_detail_api(request, discipline_id=None):
             return JsonResponse({'error': str(e)}, status=400, json_dumps_params={'ensure_ascii': False})
 
     return JsonResponse({'error': 'Метод не поддерживается'}, status=405)
+
+
+
+
+
+def _is_dean(user):
+    if not user.is_authenticated:
+        return False
+    if user.is_superuser:
+        return True
+    p = getattr(user, 'profile', None)
+    return bool(p and p.role == UserRole.DEANS_OFFICE)
+
+
+def _forbidden():
+    return JsonResponse(
+        {'error': 'Доступ ограничен'},
+        status=403,
+        json_dumps_params={'ensure_ascii': False},
+    )
+
+
+def _compute_final_from_grades(grades, assignments):
+    """Итоговая оценка с учётом весов. grades: {assignment_id: value}"""
+    total, weight_sum = 0, 0
+    for a in assignments:
+        v = grades.get(a.id)
+        if v and str(v).isdigit():
+            total += int(v) * a.weight
+            weight_sum += a.weight
+    return round(total / weight_sum, 2) if weight_sum else None
+
+
+def _final_grade(student, teaching):
+    assignments = list(Assignment.objects.filter(teaching=teaching))
+    grades = {
+        g.assignment_id: g.value
+        for g in Grade.objects.filter(student=student, assignment__in=assignments)
+    }
+    return _compute_final_from_grades(grades, assignments)
+
+
+
+def report_statement_api(request):
+    """Отчёт 1: Ведомость по группе и дисциплине. Параметр: teaching_id"""
+    if not _is_dean(request.user):
+        return _forbidden()
+
+    teaching_id = request.GET.get('teaching_id')
+    if not teaching_id:
+        return JsonResponse({'error': 'Не указан teaching_id'}, status=400,
+                            json_dumps_params={'ensure_ascii': False})
+
+    try:
+        t = Teaching.objects.select_related('group', 'discipline', 'teacher', 'semester').get(id=teaching_id)
+    except Teaching.DoesNotExist:
+        return JsonResponse({'error': 'Пара не найдена'}, status=404,
+                            json_dumps_params={'ensure_ascii': False})
+
+    assignments = list(Assignment.objects.filter(teaching=t).order_by('order'))
+    students = Student.objects.filter(group=t.group).order_by('last_name', 'first_name')
+
+    students_data = []
+    finals = []
+    for s in students:
+        grades = {
+            g.assignment_id: g.value
+            for g in Grade.objects.filter(student=s, assignment__in=assignments)
+        }
+        final = _compute_final_from_grades(grades, assignments)
+        if final is not None:
+            finals.append(final)
+        students_data.append({
+            'id': s.id,
+            'full_name': f"{s.last_name} {s.first_name} {s.middle_name}",
+            'grades': grades,
+            'final_grade': final,
+        })
+
+    avg = round(sum(finals) / len(finals), 2) if finals else None
+    quality = round(100 * sum(1 for g in finals if g >= 4) / len(finals), 1) if finals else 0
+    absolute = round(100 * sum(1 for g in finals if g >= 3) / len(finals), 1) if finals else 0
+
+    return JsonResponse({
+        'group_name': t.group.name,
+        'discipline_name': t.discipline.name,
+        'control_form': t.discipline.control_form,
+        'semester': str(t.semester),
+        'teacher': f"{t.teacher.last_name} {t.teacher.first_name[0]}.{t.teacher.middle_name[0]}.",
+        'assignments': [{'id': a.id, 'title': a.title, 'weight': a.weight} for a in assignments],
+        'students': students_data,
+        'avg_grade': avg,
+        'quality_percent': quality,
+        'absolute_percent': absolute,
+    }, json_dumps_params={'ensure_ascii': False})
+
+
+
+
+def report_student_summary_api(request):
+    """Отчёт 2: Сводная ведомость по студенту. Параметр: student_id"""
+    if not _is_dean(request.user):
+        return _forbidden()
+
+    student_id = request.GET.get('student_id')
+    if not student_id:
+        return JsonResponse({'error': 'Не указан student_id'}, status=400,
+                            json_dumps_params={'ensure_ascii': False})
+
+    try:
+        s = Student.objects.select_related('group', 'group__specialty').get(id=student_id)
+    except Student.DoesNotExist:
+        return JsonResponse({'error': 'Студент не найден'}, status=404,
+                            json_dumps_params={'ensure_ascii': False})
+
+    teachings = (Teaching.objects
+                 .filter(group=s.group)
+                 .select_related('discipline', 'semester', 'teacher')) if s.group else []
+
+    results = []
+    finals = []
+    for t in teachings:
+        assignments = list(Assignment.objects.filter(teaching=t).order_by('order'))
+        grades = {
+            g.assignment_id: g.value
+            for g in Grade.objects.filter(student=s, assignment__in=assignments)
+        }
+        final = _compute_final_from_grades(grades, assignments)
+        if final is not None:
+            finals.append(final)
+        results.append({
+            'discipline': t.discipline.name,
+            'control_form': t.discipline.control_form,
+            'semester': str(t.semester),
+            'teacher': f"{t.teacher.last_name} {t.teacher.first_name[0]}.{t.teacher.middle_name[0]}.",
+            'assignments': [
+                {'title': a.title, 'weight': a.weight, 'value': grades.get(a.id)}
+                for a in assignments
+            ],
+            'final_grade': final,
+        })
+
+    return JsonResponse({
+        'id': s.id,
+        'full_name': f"{s.last_name} {s.first_name} {s.middle_name}",
+        'group_name': s.group.name if s.group else '',
+        'specialty': s.group.specialty.name if s.group else '',
+        'course': s.group.course if s.group else None,
+        'education_form': s.education_form,
+        'status': s.status,
+        'results': results,
+        'avg_grade': round(sum(finals) / len(finals), 2) if finals else None,
+        'bad_count': sum(1 for g in finals if g < 3),
+    }, json_dumps_params={'ensure_ascii': False})
+
+
+
+def report_group_rating_api(request):
+    """Отчёт 3: Рейтинг студентов в группе. Параметр: group_id"""
+    if not _is_dean(request.user):
+        return _forbidden()
+
+    group_id = request.GET.get('group_id')
+    if not group_id:
+        return JsonResponse({'error': 'Не указан group_id'}, status=400,
+                            json_dumps_params={'ensure_ascii': False})
+
+    try:
+        g = Group.objects.get(id=group_id)
+    except Group.DoesNotExist:
+        return JsonResponse({'error': 'Группа не найдена'}, status=404,
+                            json_dumps_params={'ensure_ascii': False})
+
+    teachings = list(Teaching.objects.filter(group=g))
+    students = Student.objects.filter(group=g).order_by('last_name', 'first_name')
+
+    data = []
+    for s in students:
+        finals = [f for f in (_final_grade(s, t) for t in teachings) if f is not None]
+        data.append({
+            'id': s.id,
+            'full_name': f"{s.last_name} {s.first_name} {s.middle_name}",
+            'avg_grade': round(sum(finals) / len(finals), 2) if finals else None,
+            'bad_count': sum(1 for f in finals if f < 3),
+        })
+
+    data.sort(key=lambda x: (x['avg_grade'] is None, -(x['avg_grade'] or 0)))
+    for i, row in enumerate(data, 1):
+        row['place'] = i
+
+    return JsonResponse({
+        'group_name': g.name,
+        'students': data,
+    }, json_dumps_params={'ensure_ascii': False})
+
+
+
+def report_debtors_api(request):
+    """Отчёт 4: Должники. Параметр: group_id (опционально)"""
+    if not _is_dean(request.user):
+        return _forbidden()
+
+    group_id = request.GET.get('group_id')
+    students = Student.objects.select_related('group', 'group__specialty')
+    if group_id:
+        students = students.filter(group_id=group_id)
+
+    data = []
+    for s in students:
+        if not s.group:
+            continue
+        teachings = Teaching.objects.filter(group=s.group).select_related('discipline', 'semester')
+        for t in teachings:
+            f = _final_grade(s, t)
+            if f is not None and f < 3:
+                data.append({
+                    'student': f"{s.last_name} {s.first_name} {s.middle_name}",
+                    'group': s.group.name,
+                    'discipline': t.discipline.name,
+                    'semester': str(t.semester),
+                    'final_grade': f,
+                })
+
+    return JsonResponse(data, safe=False, json_dumps_params={'ensure_ascii': False})
+
+
+
+
+def report_statistics_api(request):
+    """Отчёт 5: Статистика. Параметр by = group | course | specialty"""
+    if not _is_dean(request.user):
+        return _forbidden()
+
+    by = request.GET.get('by', 'group')
+    if by not in ('group', 'course', 'specialty'):
+        return JsonResponse({'error': 'by должен быть group | course | specialty'}, status=400,
+                            json_dumps_params={'ensure_ascii': False})
+
+    students = Student.objects.select_related('group', 'group__specialty').all()
+
+    buckets = {}
+    for s in students:
+        if not s.group:
+            continue
+
+        if by == 'group':
+            key = s.group.name
+        elif by == 'course':
+            key = f"{s.group.course} курс"
+        else:
+            key = s.group.specialty.name
+
+        if key not in buckets:
+            buckets[key] = {'students': 0, 'grades_sum': 0, 'grades_n': 0, 'bad': 0}
+
+        b = buckets[key]
+        b['students'] += 1
+
+        for t in Teaching.objects.filter(group=s.group):
+            f = _final_grade(s, t)
+            if f is None:
+                continue
+            b['grades_sum'] += f
+            b['grades_n'] += 1
+            if f < 3:
+                b['bad'] += 1
+
+    result = [{
+        'name': key,
+        'students': b['students'],
+        'avg_grade': round(b['grades_sum'] / b['grades_n'], 2) if b['grades_n'] else None,
+        'bad_count': b['bad'],
+    } for key, b in buckets.items()]
+
+    result.sort(key=lambda x: x['name'])
+    return JsonResponse(result, safe=False, json_dumps_params={'ensure_ascii': False})
+
+
+
+def report_quality_api(request):
+    """Отчёт 6: Качество знаний. Параметр: group_id (опционально)"""
+    if not _is_dean(request.user):
+        return _forbidden()
+
+    group_id = request.GET.get('group_id')
+    students = Student.objects.select_related('group')
+    if group_id:
+        students = students.filter(group_id=group_id)
+
+    buckets = {}
+    for s in students:
+        if not s.group:
+            continue
+        key = s.group.name
+        if key not in buckets:
+            buckets[key] = {'total': 0, 'good': 0}
+        buckets[key]['total'] += 1
+
+        finals = [f for f in (_final_grade(s, t) for t in Teaching.objects.filter(group=s.group)) if f is not None]
+        avg = sum(finals) / len(finals) if finals else None
+        if avg is not None and avg >= 4:
+            buckets[key]['good'] += 1
+
+    result = [{
+        'group': key,
+        'students': b['total'],
+        'good': b['good'],
+        'quality_percent': round(100 * b['good'] / b['total'], 1) if b['total'] else 0,
+    } for key, b in buckets.items()]
+
+    result.sort(key=lambda x: x['group'])
+    return JsonResponse(result, safe=False, json_dumps_params={'ensure_ascii': False})

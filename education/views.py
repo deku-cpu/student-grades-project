@@ -61,18 +61,25 @@ def assignments_page(request, teaching_id):
 def student_diary_page(request):
     return render(request, 'education/student/diary.html')
 
-from .constants import MAIN_CARDS
+from .constants import MAIN_CARDS, REPORT_CARDS
 
 def home(request):
     profile = getattr(request.user, 'profile', None)
     role = profile.role if profile else None
 
     cards = MAIN_CARDS.get(role, [])
-
     # не пустые 
     cards = [card for card in cards if card[1]]
 
-    return render(request, 'education/home.html', {'cards': cards})
+    # Отчёты показываем только деканату
+    reports = []
+    if role == UserRole.DEANS_OFFICE:  # Убедись, что UserRole импортирован
+        reports = REPORT_CARDS
+
+    return render(request, 'education/home.html', {
+        'cards': cards,
+        'reports': reports
+    })
 
 from .choices import ControlForm
 
@@ -80,3 +87,28 @@ def disciplines_page(request):
     return render(request, 'education/dean/disciplines.html', {
         'control_forms': ControlForm.choices
     })
+
+
+
+def report_statement_page(request):
+    return render(request, 'reports/statement.html')
+
+
+def report_student_summary_page(request):
+    return render(request, 'reports/student_summary.html')
+
+
+def report_group_rating_page(request):
+    return render(request, 'reports/group_rating.html')
+
+
+def report_debtors_page(request):
+    return render(request, 'reports/debtors.html')
+
+
+def report_statistics_page(request):
+    return render(request, 'reports/statistics.html')
+
+
+def report_quality_page(request):
+    return render(request, 'reports/quality.html')

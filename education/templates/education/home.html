@@ -20,4 +20,18 @@
             <p class="home-empty">Для вашей роли пока нет доступных разделов.</p>
         {% endfor %}
     </div>
+
+    {# === Блок отчётов для деканата === #}
+    {% if reports %}
+        <h2 class="home-title" style="margin-top: 40px;">Отчёты и аналитика</h2>
+        
+        <div class="home-cards">
+            {% for card in reports %}
+                <a href="{% url card.1 %}" class="home-card">
+                    <span class="home-card__title">{{ card.0 }}</span>
+                    <span class="home-card__desc">{{ card.2 }}</span>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
 {% endblock %}

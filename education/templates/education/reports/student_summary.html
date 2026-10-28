@@ -1,0 +1,25 @@
+{% extends 'education/base.html' %}
+{% load static %}
+
+{% block title %}Сводная ведомость по студенту{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'pages/reports/student_summary/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Сводная ведомость по студенту</h1>
+
+<div class="toolbar">
+    <select id="studentSelect" style="flex: 1;">
+        <option value="">— выберите студента —</option>
+    </select>
+    <button class="btn btn--primary" id="printBtn" disabled>Печать</button>
+</div>
+
+<div id="report"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'pages/reports/student_summary/script.js' %}"></script>
+{% endblock %}
