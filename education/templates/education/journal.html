@@ -1,0 +1,25 @@
+{% extends 'education/base.html' %}
+{% load static %}
+
+{% block title %}Журнал{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'pages/journal/style.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h1 id="journal-title">Загрузка...</h1>
+
+    <table>
+        <thead id="journal-head">
+        </thead>
+        <tbody id="journal-body">
+        </tbody>
+    </table>
+
+    <div id="config" data-teaching-id="{{ teaching_id }}"></div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'pages/journal/script.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'education/base.html' %}
+{% load static %}
+
+{% block title %}Должники{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'pages/reports/debtors/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Отчёт по должникам</h1>
+
+<div class="toolbar">
+    <select id="groupSelect" style="flex: 1;">
+        <option value="">— все группы —</option>
+    </select>
+    <button class="btn btn--primary" id="printBtn" disabled>Печать</button>
+</div>
+
+<div id="report"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'pages/reports/debtors/script.js' %}"></script>
+{% endblock %}

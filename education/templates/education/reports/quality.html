@@ -1,0 +1,25 @@
+{% extends 'education/base.html' %}
+{% load static %}
+
+{% block title %}Качество знаний{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'pages/reports/quality/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Качество знаний (оценки 4–5)</h1>
+
+<div class="toolbar">
+    <select id="groupSelect" style="flex: 1;">
+        <option value="">— все группы —</option>
+    </select>
+    <button class="btn btn--primary" id="printBtn">Печать</button>
+</div>
+
+<div id="report"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'pages/reports/quality/script.js' %}"></script>
+{% endblock %}

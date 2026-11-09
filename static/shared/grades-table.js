@@ -3,13 +3,13 @@
  *
  * @param {HTMLElement} container
  * @param {Object} config
- * @param {Array}  config.students  - [{ id, name }]  — строки (ученики / предметы)
- * @param {Array}  config.lessons   - [{ id, date, topic, type }]  — колонки
+ * @param {Array} config.students  - [{ id, name }]  — строки (ученики / предметы)
+ * @param {Array} config.lessons   - [{ id, date, topic, type }]  — колонки
  * @param {Object} config.grades    - { [rowId]: { [lessonId]: value } }
  * @param {boolean} [config.editable] - true → input, false → текст
  * @param {boolean} [config.withAverage] - показывать колонку «Ср. балл»
  * @param {boolean} [config.withColumnActions] - показывать «+» и «×» в шапке
- * @param {string}  [config.firstColumnLabel] - заголовок первого столбца (по умолчанию «Ученик»)
+ * @param {string} [config.firstColumnLabel] - заголовок первого столбца (по умолчанию «Ученик»)
  * @param {Function} [config.onChange]       - (rowId, lessonId, value) => {}
  * @param {Function} [config.onAddLesson]    - () => {}
  * @param {Function} [config.onRemoveLesson] - (lesson) => {}

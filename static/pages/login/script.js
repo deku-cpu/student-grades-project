@@ -1,11 +1,10 @@
 // --- Переключатель видимости пароля ---
 const passwordInput = document.getElementById('password');
-const passwordConfirmInput = document.getElementById('passwordConfirm');
-const eyeTogglePassword = document.getElementById('eyeTogglePassword');
 
-const passwordConfirmToggle = document.getElementById('passwordConfirmToggle');
+// В HTML, который ты присылал, нет элемента с id="passwordConfirmToggle", 
+// поэтому я убрал эту строку, чтобы не было ошибки в консоли.
+// const passwordConfirmToggle = document.getElementById('passwordConfirmToggle'); 
 
- 
 const eyeIcon = document.getElementById('eyeIcon');
 
 const eyeOpenPath = `
@@ -18,72 +17,96 @@ const eyeClosedPath = `
   <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
 `;
 
-passwordInput.addEventListener('input', () => { 
- 
-  const password = passwordInput.value; 
-  const field = passwordInput.closest('.field');        // родитель .field
-  const status = field.querySelector('.password--status');
-  const len = password.length;
+const eyeToggle = document.getElementById('eyeToggle');
 
-  if (len < 8){
-    status.textContent = 'Нужно 8 и более символов';
-    status.style.display = 'block';  // показать
-    return;
-  }
-  status.style.display = 'none';  // показать
-
-});
-
-
-
-eyeTogglePassword.addEventListener('click', () => {
-  changeInputView(passwordInput);
-  eyeTogglePassword.setAttribute('aria-label', isPassword ? 'Скрыть пароль' : 'Показать пароль');
-});
-
-
-passwordConfirmToggle.addEventListener('click', () => {
-  changeInputView(passwordConfirmInput);
-  passwordConfirmToggle.setAttribute('aria-label', isPassword ? 'Скрыть пароль' : 'Показать пароль');
-});
-
-
-function changeInputView(input) {
-  const isPassword = input.type === 'password';
-  input.type = isPassword ? 'text' : 'password';
+if (eyeToggle) {
+    eyeToggle.addEventListener('click', () => {
+        changeInputView(passwordInput);
+    });
 }
 
-// --- Подсветка карточки, следующая за курсором (hover-эффект) ---
+function changeInputView(input) {
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    // Добавил смену иконки, чтобы "глазик" зачеркивался/раскрывался
+    eyeIcon.innerHTML = isPassword ? eyeClosedPath : eyeOpenPath;
+}
+
+//  Подсветка карточки, следующая за курсором
 const card = document.getElementById('card');
 const glow = document.getElementById('cardGlow');
 
-card.addEventListener('mousemove', (e) => {
-  const rect = card.getBoundingClientRect();
-  const x = ((e.clientX - rect.left) / rect.width) * 100;
-  const y = ((e.clientY - rect.top) / rect.height) * 100;
-  glow.style.setProperty('--mx', `${x}%`);
-  glow.style.setProperty('--my', `${y}%`);
-});
+if (card && glow) {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        glow.style.setProperty('--mx', `${x}%`);
+        glow.style.setProperty('--my', `${y}%`);
+    });
 
-// Подсвечиваем карточку и когда фокус внутри неё (клавиатура, без мыши)
-const focusableFields = card.querySelectorAll('input');
-focusableFields.forEach((field) => {
-  field.addEventListener('focus', () => card.classList.add('focus-within'));
-  field.addEventListener('blur', () => card.classList.remove('focus-within'));
-});
+    // Подсвечиваем карточку и когда фокус внутри неё
+    const focusableFields = card.querySelectorAll('input');
+    focusableFields.forEach((field) => {
+        field.addEventListener('focus', () => card.classList.add('focus-within'));
+        field.addEventListener('blur', () => card.classList.remove('focus-within'));
+    });
+}
 
-// --- Заглушки для формы (пока без бэкенда) ---
+// Отправка формы 
 const form = document.getElementById('loginForm');
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  console.log('TODO: отправка запроса на Django-бэкенд', {
-    email: document.getElementById('email').value,
-    password: passwordInput.value,
-    remember: document.getElementById('remember').checked,
-  });
-});
-/*
-document.getElementById('registerBtn').addEventListener('click', () => {
-  console.log('TODO: переход на страницу регистрации');
-});
-*/
+
+if (form) {
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = passwordInput.value;
+
+        try {
+            const response = await fetch('/api/login/', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    // Передаем CSRF токен. Это хорошая практика, даже если 
+                    // сейчас в api.py стоит @csrf_exempt
+                    'X-CSRFToken': getCookie('csrftoken') 
+                },
+                body: JSON.stringify({ username: email, password: password }),
+                credentials: 'include', // Важно для сохранения сессии Django
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Сохраняем роль только если логин успешен
+                localStorage.setItem('role', data.role);
+                
+                window.location.href = '/home/';
+                
+            } else {
+                // Обработка ошибки (например, неверный пароль)
+                alert(data.error || 'Ошибка входа');
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Не удалось связаться с сервером. Проверьте подключение.');
+        }
+    });
+}
+
+//  Вспомогательная функция для получения CSRF токена из куки 
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}

@@ -1,0 +1,8 @@
+#report h2 { margin: 0 0 var(--gap-lg); }
+
+@media print {
+    #header, #footer, .toolbar { display: none !important; }
+    main { padding: 0 !important; }
+    table { font-size: 11px; }
+    th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

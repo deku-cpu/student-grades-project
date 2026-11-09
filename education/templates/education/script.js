@@ -1,11 +1,6 @@
 // --- Переключатель видимости пароля ---
 const passwordInput = document.getElementById('password');
-const passwordConfirmInput = document.getElementById('passwordConfirm');
-const eyeTogglePassword = document.getElementById('eyeTogglePassword');
-
-const passwordConfirmToggle = document.getElementById('passwordConfirmToggle');
-
- 
+const eyeToggle = document.getElementById('eyeToggle');
 const eyeIcon = document.getElementById('eyeIcon');
 
 const eyeOpenPath = `
@@ -18,40 +13,12 @@ const eyeClosedPath = `
   <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
 `;
 
-passwordInput.addEventListener('input', () => { 
- 
-  const password = passwordInput.value; 
-  const field = passwordInput.closest('.field');        // родитель .field
-  const status = field.querySelector('.password--status');
-  const len = password.length;
-
-  if (len < 8){
-    status.textContent = 'Нужно 8 и более символов';
-    status.style.display = 'block';  // показать
-    return;
-  }
-  status.style.display = 'none';  // показать
-
+eyeToggle.addEventListener('click', () => {
+  const isPassword = passwordInput.type === 'password';
+  passwordInput.type = isPassword ? 'text' : 'password';
+  eyeIcon.innerHTML = isPassword ? eyeClosedPath : eyeOpenPath;
+  eyeToggle.setAttribute('aria-label', isPassword ? 'Скрыть пароль' : 'Показать пароль');
 });
-
-
-
-eyeTogglePassword.addEventListener('click', () => {
-  changeInputView(passwordInput);
-  eyeTogglePassword.setAttribute('aria-label', isPassword ? 'Скрыть пароль' : 'Показать пароль');
-});
-
-
-passwordConfirmToggle.addEventListener('click', () => {
-  changeInputView(passwordConfirmInput);
-  passwordConfirmToggle.setAttribute('aria-label', isPassword ? 'Скрыть пароль' : 'Показать пароль');
-});
-
-
-function changeInputView(input) {
-  const isPassword = input.type === 'password';
-  input.type = isPassword ? 'text' : 'password';
-}
 
 // --- Подсветка карточки, следующая за курсором (hover-эффект) ---
 const card = document.getElementById('card');
@@ -82,8 +49,7 @@ form.addEventListener('submit', (e) => {
     remember: document.getElementById('remember').checked,
   });
 });
-/*
+
 document.getElementById('registerBtn').addEventListener('click', () => {
   console.log('TODO: переход на страницу регистрации');
 });
-*/

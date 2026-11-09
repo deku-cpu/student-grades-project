@@ -1,12 +1,19 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Табель ID — Регистрация</title>
+<title>Табель ID — Вход</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+
+{# Подключаем общие стили, так как base.html не используем #}
+<link rel="stylesheet" href="{% static 'shared/base.css' %}">
+<link rel="stylesheet" href="{% static 'shared/components.css' %}">
+
+{# Стили конкретно этой страницы #}
+<link rel="stylesheet" href="{% static 'pages/login/style.css' %}">
 </head>
 <body>
 
@@ -23,7 +30,8 @@
   </div>
 
   <header class="topbar">
-    <img src="logo.jpg" alt="Табель" class="brand-logo">
+    
+    <img src="{% static 'logo.jpg' %}" alt="Табель" class="brand-logo">
   </header>
 
   <main class="card" id="card">
@@ -33,38 +41,23 @@
       <h1 class="card__title">Табель ID</h1>
       <p class="card__subtitle">Учёт успеваемости студентов</p>
 
-      <form class="form" id="loginForm" novalidate>
+      <form class="form" id="loginForm" method="POST" novalidate>
+        {% csrf_token %}
+        
         <div class="field">
           <input type="email" id="email" name="email" placeholder=" " autocomplete="username" required>
           <label for="email">E-mail</label>
         </div>
 
         <div class="field field--password">
-          <input type="password" id="password" name="password" placeholder=" " autocomplete="off" required>
+          <input type="password" id="password" name="password" placeholder=" " autocomplete="current-password" required>
           <label for="password">Пароль</label>
-          <button type="button" class="eye" id="eyeTogglePassword" aria-label="Показать пароль">
+          <button type="button" class="eye" id="eyeToggle" aria-label="Показать пароль">
             <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
               <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
             </svg>
           </button>
-          <span class = "password--status" id = "passwordValidation">
-            хы
-          </span> 
-        </div>
-
-        <div class="field field--password">
-          <input type="password" id="passwordConfirm" placeholder=" " autocomplete="off" required>
-          <label for="passwordConfirm">Повторите пароль</label>
-          <button type="button" class="eye" id="passwordConfirmToggle" aria-label="Показать пароль">
-            <svg id="eyeIconConfirm" width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
-            </svg>
-          </button>
-          <span class = "password--status" id = "passwordConfirmValidation">
-            пароль фигня полная, подумай чееееееел
-          </span> 
         </div>
 
         <div class="row">
@@ -73,14 +66,17 @@
             <span class="checkbox__box"></span>
             <span class="checkbox__label">Запомнить меня</span>
           </label>
+          <a href="#" class="link">Забыли пароль?</a>
         </div>
 
-        <button type="submit" class="btn btn--primary">Зарегистрироваться</button>
-        <!--<button type="button" class="btn btn--secondary" id="registerBtn">Регистрация</button> -->
+        
+        <button type="submit" class="btn btn--primary">Войти</button>
+        <button type="button" class="btn btn--secondary" id="registerBtn">Регистрация</button>
       </form>
     </div>
   </main>
 
-  <script src="script.js"></script>
+  
+  <script src="{% static 'pages/login/script.js' %}"></script>
 </body>
 </html>

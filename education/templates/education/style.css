@@ -294,13 +294,6 @@ body {
   transform: translateY(-1px);
 }
 
-.password--status{
-  display: none;
-  color : red;
-  font-size: 10px;   
-}
-
-
 .btn:active { transform: translateY(0); }
 
 /* Планшет и небольшие ноутбуки: карточка уже не растягивается по центру
