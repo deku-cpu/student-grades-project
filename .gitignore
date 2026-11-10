@@ -4,3 +4,7 @@
 .idea
 __pycache__/
 .word/
+backups/
+staticfiles/
+*.sqlite3
+.test-results/

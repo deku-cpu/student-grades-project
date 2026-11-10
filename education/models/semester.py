@@ -1,8 +1,9 @@
 from django.db import models
 from education.choices import SemesterNumber
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Semester(models.Model):
-    start_year = models.PositiveSmallIntegerField()
+    start_year = models.PositiveSmallIntegerField(validators=[MinValueValidator(2000), MaxValueValidator(2100)])
     number = models.PositiveSmallIntegerField(choices=SemesterNumber.choices)
 
     class Meta:

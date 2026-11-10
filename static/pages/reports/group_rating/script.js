@@ -8,8 +8,7 @@ const printBtn = document.getElementById('printBtn');
 printBtn.addEventListener('click', () => window.print());
 
 (async function loadGroups() {
-    const res = await fetch('/api/groups/', { credentials: 'same-origin' });
-    const data = await res.json();
+    const data = await getJson('/api/groups/', { credentials: 'same-origin' });
     data.sort((a, b) => a.name.localeCompare(b.name));
     for (const g of data) {
         const o = document.createElement('option');
@@ -17,14 +16,13 @@ printBtn.addEventListener('click', () => window.print());
         o.textContent = g.name;
         sel.appendChild(o);
     }
-})();
+})().catch(showReportError);
 
-sel.addEventListener('change', async () => {
+sel.addEventListener('change', () => reportTask(async () => {
     if (!sel.value) { report.innerHTML = ''; printBtn.disabled = true; return; }
     report.innerHTML = '<p>Загрузка…</p>';
-    const res = await fetch('/api/reports/group-rating/?group_id=' + sel.value,
+    const d = await getJson('/api/reports/group-rating/?group_id=' + sel.value,
                             { credentials: 'same-origin' });
-    const d = await res.json();
 
     let html = `<h2>Рейтинг группы ${esc(d.group_name)}</h2>
         <table><thead><tr>
@@ -34,7 +32,7 @@ sel.addEventListener('change', async () => {
     d.students.forEach(s => {
         const cls = s.place <= 3 ? `place-${s.place}` : '';
         html += `<tr>
-            <td class="${cls}">${s.place}</td>
+            <td class="${cls}">${s.place ?? '—'}</td>
             <td>${esc(s.full_name)}</td>
             <td><b>${s.avg_grade ?? '—'}</b></td>
             <td>${s.bad_count}</td>
@@ -43,4 +41,4 @@ sel.addEventListener('change', async () => {
 
     report.innerHTML = html + `</tbody></table>`;
     printBtn.disabled = false;
-});
+}));

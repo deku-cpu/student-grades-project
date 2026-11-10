@@ -1,0 +1,26 @@
+{% extends 'education/base.html' %}
+{% load static %}
+{% block title %}{{ reference_title }}{% endblock %}
+{% block content %}
+<h1>{{ reference_title }}</h1>
+<div class="toolbar">
+    <div class="field"><label for="filterSearch">Поиск</label><input id="filterSearch"></div>
+    <button id="addRecordBtn" class="btn btn--primary">Добавить</button>
+</div>
+<table><thead><tr><th>ID</th>{% for field in fields %}<th>{{ field.label }}</th>{% endfor %}<th>Действия</th></tr></thead>
+<tbody id="records-body"></tbody></table>
+<div id="editingModal" class="modal hidden">
+    <form id="editFormTag">
+        <input id="editId" type="hidden">
+        {% for field in fields %}
+        <div class="field"><label for="edit-{{ field.name }}">{{ field.label }}</label>
+            <input id="edit-{{ field.name }}" name="{{ field.name }}" type="{{ field.type }}" {% if field.type == 'number' %}min="{{ field.min }}" max="{{ field.max }}"{% else %}maxlength="150"{% endif %} required>
+        </div>
+        {% endfor %}
+        <div><button class="btn btn--primary" type="submit">Сохранить</button>
+        <button class="btn btn--secondary" id="cancelEditBtn" type="button">Отмена</button></div>
+    </form>
+</div>
+{{ reference_config|json_script:'reference-config' }}
+{% endblock %}
+{% block extra_js %}<script src="{% static 'pages/references/script.js' %}"></script>{% endblock %}

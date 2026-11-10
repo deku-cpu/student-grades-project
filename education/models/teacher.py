@@ -1,17 +1,18 @@
 from django.db import models
 from education.choices import PositionStatus, AcademicDegreeStatus
+from django.core.validators import RegexValidator
 
 class Teacher(models.Model):
     # Преподаватели: ФИО, кафедра, должность, ученая степень, контактные данные.
 
     last_name = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
-    middle_name = models.CharField(max_length=100)
+    middle_name = models.CharField(max_length=100, blank=True)
     department = models.ForeignKey('Department', on_delete=models.PROTECT, related_name='teachers')
     position = models.CharField(max_length=100, choices=PositionStatus.choices)
-    academic_degree = models.CharField(max_length=30, choices=AcademicDegreeStatus.choices)
+    academic_degree = models.CharField(max_length=30, choices=AcademicDegreeStatus.choices, blank=True)
     email = models.EmailField()
-    phone_number = models.CharField(max_length=12)
+    phone_number = models.CharField(max_length=12, blank=True, validators=[RegexValidator(r'^\+?\d{10,11}$', 'Введите телефон из 10–11 цифр, можно с +')])
     user = models.OneToOneField('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='teacher_profile')
 
     def __str__(self):

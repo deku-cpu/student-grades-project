@@ -65,6 +65,7 @@
                 <th>Форма</th>
                 <th>Год</th>       
                 <th>Студентов</th>
+                <th>Куратор</th>
                 <th>Действия</th>
             </tr>
         </thead>
@@ -120,6 +121,12 @@
             </div>
 
             <div>
+                <div class="field">
+                    <label for="editCurator">Куратор</label>
+                    <select id="editCurator"><option value="">Без куратора</option>
+                        {% for teacher in teachers %}<option value="{{ teacher.pk }}">{{ teacher }}</option>{% endfor %}
+                    </select>
+                </div>
                 <button type="submit" class="btn btn--primary">Сохранить</button>
                 <button type="button" class="btn btn--secondary" id="cancelEditBtn">Отменить</button>
             </div>

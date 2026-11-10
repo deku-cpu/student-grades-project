@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let formVal = document.getElementById('filterForm').value;
         let status = document.getElementById('filterStatus').value;
 
-        let url = '/api/students/?search=' + search + '&group=' + group + '&form=' + formVal + '&status=' + status;
+        let url = '/api/students/?' + new URLSearchParams({search: search, group: group, form: formVal, status: status});
 
         fetch(url)
         .then(response => response.json())
@@ -30,11 +30,11 @@ document.addEventListener('DOMContentLoaded', function() {
                               '<button onclick="deleteStudent(' + s.id + ')" class="btn btn--secondary">Удалить</button>';
 
                 let row = '<tr>' +
-                    '<td>' + s.id + '</td>' +
-                    '<td>' + s.full_name + '</td>' +
-                    '<td>' + s.group_name + '</td>' +
-                    '<td>' + s.education_form + '</td>' +
-                    '<td>' + s.status + '</td>' +
+                    '<td>' + escapeHtml(s.id) + '</td>' +
+                    '<td>' + escapeHtml(s.full_name) + '</td>' +
+                    '<td>' + escapeHtml(s.group_name) + '</td>' +
+                    '<td>' + escapeHtml(s.education_form_label) + '</td>' +
+                    '<td>' + escapeHtml(s.status_label) + '</td>' +
                     '<td>' + buttons + '</td>' +
                 '</tr>';
                 tableBody.innerHTML += row;
@@ -68,8 +68,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.deleteStudent = function(id) {
         if (confirm('Точно удалить студента?')) {
-            fetch('/api/students/' + id + '/', { method: 'DELETE' })
-            .then(() => loadStudents());
+            getJson('/api/students/' + id + '/', { method: 'DELETE' })
+            .then(() => loadStudents())
+            .catch(showError);
         }
     };
 
@@ -82,6 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
     form.onsubmit = function(event) {
         event.preventDefault();
         let id = document.getElementById('editId').value;
+        if (id && !confirm('Сохранить изменения?')) return;
         
         let data = {
             last_name: document.getElementById('editLastName').value,

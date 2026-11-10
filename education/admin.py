@@ -1,5 +1,7 @@
 from django.contrib import admin
 from education.models import *
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
 
 
 @admin.register(Student)
@@ -67,3 +69,34 @@ class AssignmentAdmin(admin.ModelAdmin):
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'role')
     list_filter = ('role',)
+
+
+class ProfileInline(admin.StackedInline):
+    model = Profile
+    extra = 1
+    max_num = 1
+
+
+admin.site.unregister(User)
+
+
+@admin.register(User)
+class AccountAdmin(UserAdmin):
+    inlines = [ProfileInline]
+
+
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display = ('created_at', 'user', 'action', 'path')
+    list_filter = ('action', 'created_at')
+    search_fields = ('user__username', 'path')
+    readonly_fields = ('created_at', 'user', 'action', 'path')
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

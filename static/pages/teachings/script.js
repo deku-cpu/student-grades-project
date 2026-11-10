@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function loadTeachings() {
         let search = document.getElementById('filterSearch').value;
-        let url = '/api/teachings/?search=' + search;
+        let url = '/api/teachings/?search=' + encodeURIComponent(search);
 
         fetch(url)
         .then(response => response.json())
@@ -23,15 +23,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Кнопки: Задания, Ред., Удалить
                 let buttons = '<button onclick="goToAssignments(' + t.id + ')" class="btn btn--secondary">Задания</button> ' +
+                              '<a class="btn btn--secondary" href="/journal/' + t.id + '/">Журнал</a> ' +
                               '<button onclick="editTeaching(' + t.id + ')" class="btn btn--secondary">Ред.</button> ' +
                               '<button onclick="deleteTeaching(' + t.id + ')" class="btn btn--secondary">Удалить</button>';
 
                 let row = '<tr>' +
-                    '<td>' + t.id + '</td>' +
-                    '<td>' + t.group_name + '</td>' +
-                    '<td>' + t.discipline_name + '</td>' +
-                    '<td>' + t.teacher_name + '</td>' +
-                    '<td>' + t.semester_name + '</td>' +
+                    '<td>' + escapeHtml(t.id) + '</td>' +
+                    '<td>' + escapeHtml(t.group_name) + '</td>' +
+                    '<td>' + escapeHtml(t.discipline_name) + '</td>' +
+                    '<td>' + escapeHtml(t.teacher_name) + '</td>' +
+                    '<td>' + escapeHtml(t.semester_name) + '</td>' +
                     '<td>' + buttons + '</td>' +
                 '</tr>';
                 tableBody.innerHTML += row;
@@ -79,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
     form.onsubmit = function(event) {
         event.preventDefault();
         let id = document.getElementById('editId').value;
+        if (id && !confirm('Сохранить изменения?')) return;
         
         let data = {
             group_id: document.getElementById('editGroup').value,

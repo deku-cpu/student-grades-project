@@ -72,7 +72,7 @@ if (form) {
                     // сейчас в api.py стоит @csrf_exempt
                     'X-CSRFToken': getCookie('csrftoken') 
                 },
-                body: JSON.stringify({ username: email, password: password }),
+                body: JSON.stringify({ username: email.trim(), password: password, remember: document.getElementById('remember').checked }),
                 credentials: 'include', // Важно для сохранения сессии Django
             });
 
@@ -110,3 +110,12 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+// Аккаунты и восстановление доступа ведёт администратор университета.
+document.getElementById('registerBtn').onclick = function() {
+    alert('Учётную запись создаёт администратор. Обратитесь в деканат.');
+};
+document.getElementById('forgotPassword').onclick = function(event) {
+    event.preventDefault();
+    alert('Для смены пароля обратитесь к администратору или в деканат.');
+};

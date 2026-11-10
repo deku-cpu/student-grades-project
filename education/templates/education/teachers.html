@@ -70,8 +70,8 @@
             
             <div class="field">
                 <label for="editDepartment">Кафедра</label>
-                <select id="editDepartment">
-                    <option value="">Без кафедры</option>
+                <select id="editDepartment" required>
+                    <option value="">Выберите кафедру</option>
                     {% for dept in departments %}
                         <option value="{{ dept.id }}">{{ dept.name }}</option>
                     {% endfor %}

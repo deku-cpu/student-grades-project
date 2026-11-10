@@ -28,11 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (control) url.searchParams.append('control_form', control);
 
         try {
-            const response = await fetch(url);
-            const data = await response.json();
+            const data = await getJson(url);
             renderTable(data);
         } catch (error) {
-            console.error('Ошибка загрузки:', error);
+            tbody.innerHTML = '<tr><td colspan="7">' + escapeHtml(error.message) + '</td></tr>';
         }
     }
 
@@ -49,11 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             tr.innerHTML = `
                 <td>${item.id}</td>
-                <td>${item.name}</td>
+                <td>${escapeHtml(item.name)}</td>
                 <td>${item.hours_lecture}</td>
                 <td>${item.hours_practice}</td>
                 <td>${item.hours_lab}</td>
-                <td>${controlText}</td>
+                <td>${escapeHtml(controlText)}</td>
                 <td>
                     <button class="btn btn--secondary" onclick="openEditModal(${item.id})">Ред.</button>
                     <button class="btn btn--danger" onclick="deleteDiscipline(${item.id})">Удал.</button>
@@ -105,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
 
         const id = editId.value;
+        if (id && !confirm('Сохранить изменения?')) return;
         const payload = {
             name: editName.value,
             description: editDescription.value,
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken') // На случай если csrf_exempt не сработает
+                    'X-CSRFToken': getCookie('csrftoken')
                 },
                 body: JSON.stringify(payload)
             });
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 loadDisciplines();
             } else {
-                alert('Ошибка при удалении');
+                alert((await response.json()).error || 'Ошибка при удалении');
             }
         } catch (error) {
             console.error('Ошибка:', error);

@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from education.choices import GradeType
+from decimal import Decimal
 
 class Assignment(models.Model):
     # Назначение группе работы 
@@ -8,11 +9,12 @@ class Assignment(models.Model):
     teaching = models.ForeignKey('Teaching', on_delete=models.PROTECT, related_name='assignments')
     title = models.CharField(max_length=50)
     grade_type = models.CharField(max_length=15, choices=GradeType.choices)
-    weight = models.PositiveSmallIntegerField(default=0.1, validators=[MinValueValidator(0.1), MaxValueValidator(1)])
+    weight = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('1'), validators=[MinValueValidator(Decimal('0.01')), MaxValueValidator(Decimal('100'))])
     order = models.PositiveSmallIntegerField(default=0)
     date = models.DateField(null=True, blank=True)
 
     class Meta:
+        ordering = ['order', 'id']
         constraints = [
             models.UniqueConstraint(fields=['teaching', 'title'], name='unique_assignment_title'),
         ]

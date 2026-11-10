@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: grades_checks
+      POSTGRES_USER: grades
+      POSTGRES_PASSWORD: grades-test-only
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grades -d grades_checks"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+  tests:
+    image: student-grades-project-web:latest
+    working_dir: /app
+    volumes:
+      - .:/app:ro
+    environment:
+      POSTGRES_DB: grades_checks
+      POSTGRES_USER: grades
+      POSTGRES_PASSWORD: grades-test-only
+      POSTGRES_HOST: db
+      TEST_DATABASE: postgres
+      DJANGO_SETTINGS_MODULE: student_grades_project.test_settings
+    depends_on:
+      db:
+        condition: service_healthy
+    command: python manage.py test education --verbosity 2
+  preview:
+    image: student-grades-project-web:latest
+    working_dir: /app
+    volumes:
+      - .:/app:ro
+    environment:
+      POSTGRES_DB: grades_checks
+      POSTGRES_USER: grades
+      POSTGRES_PASSWORD: grades-test-only
+      POSTGRES_HOST: db
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,testserver
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8001:8000"
+    command: python manage.py runserver 0.0.0.0:8000 --noreload

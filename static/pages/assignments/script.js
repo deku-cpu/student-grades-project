@@ -32,11 +32,11 @@ document.addEventListener('DOMContentLoaded', function() {
                               '<button onclick="deleteAssignment(' + a.id + ')" class="btn btn--secondary">Удалить</button>';
 
                 let row = '<tr>' +
-                    '<td>' + a.id + '</td>' +
-                    '<td>' + a.title + '</td>' +
-                    '<td>' + a.grade_type + '</td>' +
-                    '<td>' + a.weight + '</td>' +
-                    '<td>' + a.order + '</td>' +
+                    '<td>' + escapeHtml(a.id) + '</td>' +
+                    '<td>' + escapeHtml(a.title) + '</td>' +
+                    '<td>' + escapeHtml(a.grade_type_label) + '</td>' +
+                    '<td>' + escapeHtml(a.weight) + '</td>' +
+                    '<td>' + escapeHtml(a.order) + '</td>' +
                     '<td>' + (a.date || '—') + '</td>' +
                     '<td>' + buttons + '</td>' +
                 '</tr>';
@@ -88,6 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('addAssignmentBtn').onclick = function() {
         form.reset();
         document.getElementById('editId').value = '';
+        document.getElementById('editWeight').value = '1';
         document.getElementById('editOrder').value = '0'; // По умолчанию
         modal.classList.remove('hidden');
     };
@@ -96,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
     form.onsubmit = function(event) {
         event.preventDefault();
         let id = document.getElementById('editId').value;
+        if (id && !confirm('Сохранить изменения?')) return;
         
         let data = {
             title: document.getElementById('editTitle').value,

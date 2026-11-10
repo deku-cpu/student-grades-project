@@ -1,0 +1,5 @@
+{% extends 'education/base.html' %}
+{% load static %}
+{% block title %}Мой рейтинг{% endblock %}
+{% block content %}<h1>Мой рейтинг</h1><div id="rating">Загрузка...</div>{% endblock %}
+{% block extra_js %}<script src="{% static 'pages/student/rating/script.js' %}"></script>{% endblock %}

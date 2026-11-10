@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let dept = document.getElementById('filterDepartment').value;
         let position = document.getElementById('filterPosition').value;
 
-        let url = '/api/teachers/?search=' + search + '&department=' + dept + '&position=' + position;
+        let url = '/api/teachers/?' + new URLSearchParams({search: search, department: dept, position: position});
 
         fetch(url)
         .then(response => response.json())
@@ -28,10 +28,10 @@ document.addEventListener('DOMContentLoaded', function() {
                               '<button onclick="deleteTeacher(' + t.id + ')" class="btn btn--secondary">Удалить</button>';
 
                 let row = '<tr>' +
-                    '<td>' + t.id + '</td>' +
-                    '<td>' + t.full_name + '</td>' +
-                    '<td>' + t.department_name + '</td>' +
-                    '<td>' + t.position + '</td>' +
+                    '<td>' + escapeHtml(t.id) + '</td>' +
+                    '<td>' + escapeHtml(t.full_name) + '</td>' +
+                    '<td>' + escapeHtml(t.department_name) + '</td>' +
+                    '<td>' + escapeHtml(t.position_label) + '</td>' +
                     '<td>' + buttons + '</td>' +
                 '</tr>';
                 tableBody.innerHTML += row;
@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
     form.onsubmit = function(event) {
         event.preventDefault();
         let id = document.getElementById('editId').value;
+        if (id && !confirm('Сохранить изменения?')) return;
         
         let data = {
             last_name: document.getElementById('editLastName').value,

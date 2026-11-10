@@ -1,0 +1,8 @@
+.git
+.venv
+.env
+cookies.txt
+backups
+*.sqlite3
+__pycache__
+.test-results

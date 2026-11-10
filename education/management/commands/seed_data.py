@@ -27,6 +27,7 @@ class Command(BaseCommand):
         self.create_students()
         self.create_disciplines()
         self.create_teaching()
+        self.create_assignments()
         self.create_grades()
         self.stdout.write(self.style.SUCCESS('Готово!'))
 
@@ -122,14 +123,14 @@ class Command(BaseCommand):
         teachers = {teacher.last_name: teacher for teacher in Teacher.objects.all()}
 
         data = [
-            ('ИВТ-24', '09.03.01', 3, 2024, 'Кузнецов'),
-            ('ИС-25', '09.03.02', 2, 2025, 'Смирнова'),
-            ('ПИ-25', '09.03.03', 2, 2025, 'Новикова'),
-            ('ПИ-24', '09.03.04', 3, 2024, 'Соколов'),
-            ('ИВТ-25', '09.03.01', 2, 2025, None),
+            ('ИВТ-24', '09.03.01', 3, GroupStatus.FULL_TIME, 2024, 'Кузнецов'),
+            ('ИС-25', '09.03.02', 2, GroupStatus.PART_TIME,2025, 'Смирнова'),
+            ('ПИ-25', '09.03.03', 2, GroupStatus.FULL_TIME, 2025, 'Новикова'),
+            ('ПИ-24', '09.03.04', 3, GroupStatus.HYBRID_PROGRAM,2024, 'Соколов'),
+            ('ИВТ-25', '09.03.01', 2, GroupStatus.FULL_TIME,2025, None),
         ]
 
-        for name, specialty_code, course, admission_year, curator_name in data:
+        for name, specialty_code, course, mode_of_study, admission_year, curator_name in data:
             specialty = specialties[specialty_code]
             curator = teachers[curator_name] if curator_name else None
 
@@ -355,13 +356,16 @@ class Command(BaseCommand):
         self.stdout.write(f'Работа {obj}: {"создана" if created else "уже есть"}')
 
     def create_grades(self):
+        generator = random.Random(42)
         grade_values = [GradeStatus.TWO, GradeStatus.THREE, GradeStatus.FOUR, GradeStatus.FIVE]
 
         count_created = 0
         for assignment in Assignment.objects.select_related('teaching__group'):
             students = Student.objects.filter(group=assignment.teaching.group)
             for student in students:
-                value = random.choice(grade_values)
+                value = generator.choice(grade_values)
+                if assignment.grade_type == GradeType.FINAL and assignment.teaching.discipline.control_form == ControlForm.CREDIT:
+                    value = GradeStatus.FAIL if value == GradeStatus.TWO else GradeStatus.PASS
                 obj, created = Grade.objects.get_or_create(
                     student=student,
                     assignment=assignment,

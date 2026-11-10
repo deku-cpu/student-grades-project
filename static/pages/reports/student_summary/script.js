@@ -8,8 +8,7 @@ const printBtn = document.getElementById('printBtn');
 printBtn.addEventListener('click', () => window.print());
 
 (async function loadStudents() {
-    const res = await fetch('/api/students/', { credentials: 'same-origin' });
-    const data = await res.json();
+    const data = await getJson('/api/students/', { credentials: 'same-origin' });
     data.sort((a, b) => a.full_name.localeCompare(b.full_name));
     for (const s of data) {
         const o = document.createElement('option');
@@ -17,14 +16,15 @@ printBtn.addEventListener('click', () => window.print());
         o.textContent = `${s.full_name} (${s.group_name || 'без группы'})`;
         sel.appendChild(o);
     }
-})();
+    const selected = new URLSearchParams(window.location.search).get('student_id');
+    if (selected) { sel.value = selected; sel.dispatchEvent(new Event('change')); }
+})().catch(showReportError);
 
-sel.addEventListener('change', async () => {
+sel.addEventListener('change', () => reportTask(async () => {
     if (!sel.value) { report.innerHTML = ''; printBtn.disabled = true; return; }
     report.innerHTML = '<p>Загрузка…</p>';
-    const res = await fetch('/api/reports/student-summary/?student_id=' + sel.value,
+    const d = await getJson('/api/reports/student-summary/?student_id=' + sel.value,
                             { credentials: 'same-origin' });
-    const d = await res.json();
 
     let html = `
         <div class="report-header">
@@ -48,18 +48,18 @@ sel.addEventListener('change', async () => {
 
     d.results.forEach(r => {
         const grades = r.assignments
-            .map(a => `${esc(a.title)}: ${esc(a.value ?? '—')}`)
+            .map(a => `${esc(a.title)}: ${esc(formatGrade(a.value))}`)
             .join('<br>');
         html += `<tr>
-            <td>${esc(r.discipline)}</td>
+            <td>${esc(r.discipline)}<br><small>${esc(r.group)}</small></td>
             <td>${esc(r.semester)}</td>
             <td>${esc(r.teacher)}</td>
             <td>${esc(r.control_form)}</td>
             <td class="grades-cell">${grades}</td>
-            <td class="final-grade">${r.final_grade ?? '—'}</td>
+            <td class="final-grade">${esc(formatGrade(r.final_grade))}</td>
         </tr>`;
     });
 
     report.innerHTML = html + `</tbody></table>`;
     printBtn.disabled = false;
-});
+}));

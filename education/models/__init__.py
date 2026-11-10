@@ -9,3 +9,4 @@ from .teaching import Teaching
 from .grade import Grade
 from .assignment import Assignment
 from .profile import Profile
+from .audit_log import AuditLog

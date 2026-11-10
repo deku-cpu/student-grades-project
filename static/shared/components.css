@@ -285,3 +285,10 @@ th {
 .toolbar .btn {
     margin-left: auto; /* прижимает кнопку вправо */
 }
+/* Длинный журнал прокручивается внутри страницы. */
+main { flex: 1 0 auto; overflow-x: auto; }
+.grade-input { min-width: 100px; }
+thead th { cursor: pointer; }
+@media print {
+    main { overflow: visible; }
+}

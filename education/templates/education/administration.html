@@ -1,0 +1,15 @@
+{% extends 'education/base.html' %}
+{% load static %}
+{% block title %}Администрирование{% endblock %}
+{% block content %}
+<h1>Администрирование</h1>
+<div class="toolbar">
+    <a class="btn btn--secondary" href="{% url 'admin:auth_user_changelist' %}">Пользователи и роли</a>
+    <button class="btn btn--primary" id="backupBtn">Скачать резервную копию</button>
+</div>
+<h2>Журнал действий</h2>
+<div class="toolbar"><div class="field"><label for="filterSearch">Пользователь, действие или адрес</label><input id="filterSearch"></div></div>
+<p>Последние 500 действий. Изменения в панели Django также доступны в её журнале.</p>
+<table><thead><tr><th>Дата</th><th>Пользователь</th><th>Действие</th><th>Адрес</th></tr></thead><tbody id="audit-body"></tbody></table>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'pages/administration/script.js' %}"></script>{% endblock %}

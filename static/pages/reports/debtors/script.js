@@ -10,8 +10,7 @@ printBtn.addEventListener('click', () => window.print());
 async function load() {
     report.innerHTML = '<p>Загрузка…</p>';
     const url = '/api/reports/debtors/' + (sel.value ? '?group_id=' + sel.value : '');
-    const res = await fetch(url, { credentials: 'same-origin' });
-    const d = await res.json();
+    const d = await getJson(url, { credentials: 'same-origin' });
 
     if (!d.length) {
         report.innerHTML = '<p>Должников нет.</p>';
@@ -29,7 +28,7 @@ async function load() {
             <td>${esc(r.group)}</td>
             <td>${esc(r.discipline)}</td>
             <td>${esc(r.semester)}</td>
-            <td class="final-grade">${r.final_grade}</td>
+            <td class="final-grade">${esc(formatGrade(r.final_grade))}</td>
         </tr>`;
     });
     report.innerHTML = html + `</tbody></table>`;
@@ -37,8 +36,7 @@ async function load() {
 }
 
 (async function init() {
-    const res = await fetch('/api/groups/', { credentials: 'same-origin' });
-    const data = await res.json();
+    const data = await getJson('/api/groups/', { credentials: 'same-origin' });
     data.sort((a, b) => a.name.localeCompare(b.name));
     for (const g of data) {
         const o = document.createElement('option');
@@ -46,7 +44,7 @@ async function load() {
         o.textContent = g.name;
         sel.appendChild(o);
     }
-    load();
-})();
+    await load();
+})().catch(showReportError);
 
-sel.addEventListener('change', load);
+sel.addEventListener('change', () => reportTask(load));

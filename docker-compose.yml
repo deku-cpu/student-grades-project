@@ -3,26 +3,35 @@ services:
     image: postgres:17
     container_name: students_grades_db
     environment:
-      POSTGRES_DB: education-grades-projectdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-education-grades-projectdb}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
 
   web:
     build: .
+    image: student-grades-project-web:latest
     container_name: students_grades_web
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh scripts/start.sh
     volumes:
       - .:/app
     ports:
       - "8000:8000"
     env_file:
       - .env
+    environment:
+      POSTGRES_HOST: db
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
   postgres_data:

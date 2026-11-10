@@ -1,0 +1,19 @@
+{% extends 'education/base.html' %}
+{% block title %}Карточка студента{% endblock %}
+{% block content %}
+<h1>{{ student }}</h1>
+<div class="toolbar">
+    <a class="btn btn--secondary" href="{% url 'students_page' %}">К списку студентов</a>
+    <a class="btn btn--primary" href="{% url 'report_student_summary_page' %}?student_id={{ student.pk }}">Все оценки</a>
+</div>
+<table><tbody>
+    <tr><th>Группа</th><td>{{ student.group|default:'Нет группы' }}</td></tr>
+    <tr><th>Дата рождения</th><td>{{ student.date_of_birth|date:'d.m.Y' }}</td></tr>
+    <tr><th>Пол</th><td>{{ student.get_gender_display }}</td></tr>
+    <tr><th>Email</th><td>{{ student.email }}</td></tr>
+    <tr><th>Телефон</th><td>{{ student.phone_number|default:'—' }}</td></tr>
+    <tr><th>Форма обучения</th><td>{{ student.get_education_form_display }}</td></tr>
+    <tr><th>Дата поступления</th><td>{{ student.admission_date|date:'d.m.Y' }}</td></tr>
+    <tr><th>Статус</th><td>{{ student.get_status_display }}</td></tr>
+</tbody></table>
+{% endblock %}

@@ -8,8 +8,7 @@ const printBtn = document.getElementById('printBtn');
 printBtn.addEventListener('click', () => window.print());
 
 (async function loadTeachings() {
-    const res = await fetch('/api/teachings/', { credentials: 'same-origin' });
-    const data = await res.json();
+    const data = await getJson('/api/teachings/', { credentials: 'same-origin' });
     data.sort((a, b) => a.group_name.localeCompare(b.group_name));
     for (const t of data) {
         const o = document.createElement('option');
@@ -17,14 +16,13 @@ printBtn.addEventListener('click', () => window.print());
         o.textContent = `${t.group_name} — ${t.discipline_name} (${t.semester_name}, ${t.teacher_name})`;
         sel.appendChild(o);
     }
-})();
+})().catch(showReportError);
 
-sel.addEventListener('change', async () => {
+sel.addEventListener('change', () => reportTask(async () => {
     if (!sel.value) { report.innerHTML = ''; printBtn.disabled = true; return; }
     report.innerHTML = '<p>Загрузка…</p>';
-    const res = await fetch('/api/reports/statement/?teaching_id=' + sel.value,
+    const d = await getJson('/api/reports/statement/?teaching_id=' + sel.value,
                             { credentials: 'same-origin' });
-    const d = await res.json();
 
     let html = `
         <div class="report-header">
@@ -45,8 +43,8 @@ sel.addEventListener('change', async () => {
 
     d.students.forEach((s, i) => {
         html += `<tr><td>${i + 1}</td><td>${esc(s.full_name)}</td>`;
-        d.assignments.forEach(a => html += `<td>${esc(s.grades[a.id] ?? '—')}</td>`);
-        html += `<td class="final-grade">${s.final_grade ?? '—'}</td></tr>`;
+        d.assignments.forEach(a => html += `<td>${esc(formatGrade(s.grades[a.id]))}</td>`);
+        html += `<td class="final-grade">${esc(formatGrade(s.final_grade))}</td></tr>`;
     });
     html += `</tbody></table>
         <div class="report-stats">
@@ -58,4 +56,4 @@ sel.addEventListener('change', async () => {
 
     report.innerHTML = html;
     printBtn.disabled = false;
-});
+}));

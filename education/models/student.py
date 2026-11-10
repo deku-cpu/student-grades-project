@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from datetime import date
 from education.choices import EducationForm, Gender, StudentStatus
 
@@ -8,11 +8,11 @@ class Student(models.Model):
 
     last_name = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
-    middle_name = models.CharField(max_length=100)
-    date_of_birth = models.DateField(validators=[MinValueValidator(date(1900, 1, 1)), MaxValueValidator(date.today())])
+    middle_name = models.CharField(max_length=100, blank=True)
+    date_of_birth = models.DateField(validators=[MinValueValidator(date(1900, 1, 1)), MaxValueValidator(date.today)])
     gender = models.CharField(max_length=1, choices=Gender.choices, default=Gender.MALE)
     email = models.EmailField()
-    phone_number = models.CharField(max_length=12)
+    phone_number = models.CharField(max_length=12, blank=True, validators=[RegexValidator(r'^\+?\d{10,11}$', 'Введите телефон из 10–11 цифр, можно с +')])
     group = models.ForeignKey('Group', on_delete=models.SET_NULL, null=True, blank=True, related_name='students')
     education_form = models.CharField(max_length=10, choices=EducationForm.choices)
     admission_date = models.DateField(default=date.today)

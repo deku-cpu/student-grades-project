@@ -45,8 +45,8 @@
         {% csrf_token %}
         
         <div class="field">
-          <input type="email" id="email" name="email" placeholder=" " autocomplete="username" required>
-          <label for="email">E-mail</label>
+          <input type="text" id="email" name="email" placeholder=" " autocomplete="username" required>
+          <label for="email">Логин или e-mail</label>
         </div>
 
         <div class="field field--password">
@@ -66,7 +66,7 @@
             <span class="checkbox__box"></span>
             <span class="checkbox__label">Запомнить меня</span>
           </label>
-          <a href="#" class="link">Забыли пароль?</a>
+          <a href="#" class="link" id="forgotPassword">Забыли пароль?</a>
         </div>
 
         

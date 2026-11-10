@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let specialization = document.getElementById("filterSpecialization").value;
 
         // Собираем ссылку для запроса
-        let url = '/api/groups/?search=' + search + '&course=' + course + '&form=' + formVal + '&specialty=' + specialization;
+        let url = '/api/groups/?' + new URLSearchParams({search: search, course: course, form: formVal, specialty: specialization});
 
         // Стучимся на сервер за данными
         fetch(url).then(function(response) {
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Если сервер вернул ошибку (например, студенту нельзя)
             if (!Array.isArray(groups)) {
-                tableBody.innerHTML = '<tr><td colspan="8">Доступ ограничен</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="9">Доступ ограничен</td></tr>';
                 return; // Останавливаемся
             }
 
@@ -41,13 +41,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Лепим строчку для таблицы
                 let row = '<tr>' +
-                    '<td>' + g.id + '</td>' +
-                    '<td>' + g.name + '</td>' +
-                    '<td>' + g.yearOfStudy + '</td>' +
-                    '<td>' + g.specialty + '</td>' +
-                    '<td>' + g.form + '</td>' +
-                    '<td>' + g.admissionYear + '</td>' +
-                    '<td>' + g.students + '</td>' +
+                    '<td>' + escapeHtml(g.id) + '</td>' +
+                    '<td>' + escapeHtml(g.name) + '</td>' +
+                    '<td>' + escapeHtml(g.yearOfStudy) + '</td>' +
+                    '<td>' + escapeHtml(g.specialty) + '</td>' +
+                    '<td>' + escapeHtml(g.form_label) + '</td>' +
+                    '<td>' + escapeHtml(g.admissionYear) + '</td>' +
+                    '<td>' + escapeHtml(g.students) + '</td>' +
+                    '<td>' + escapeHtml(g.curator) + '</td>' +
                     '<td>' + buttons + '</td>' +
                 '</tr>';
 
@@ -70,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('editSpecialization').value = g.specialty_id; // ID специальности
             document.getElementById('editForm').value = g.form;
             document.getElementById('editAdmissionYear').value = g.admissionYear;
+            document.getElementById('editCurator').value = g.curator_id;
             
             document.getElementById('editStudentCount').value = g.students; 
             modal.classList.remove('hidden');
@@ -82,7 +84,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (ask === true) {
             // Отправляем запрос на удаление
             fetch('/api/groups/' + id + '/', { method: 'DELETE' })
-            .then(function() {
+            .then(async function(response) {
+                if (!response.ok) { alert((await response.json()).error); return; }
                 loadGroups(); // Обновляем таблицу после удаления
             });
         }
@@ -102,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault(); // Не даем странице перезагрузиться
 
         let id = document.getElementById('editId').value; // Берем ID (пустой или с цифрой)
+        if (id && !confirm('Сохранить изменения?')) return;
         
         // Собираем данные из полей
         let data = {
@@ -109,7 +113,8 @@ document.addEventListener('DOMContentLoaded', function() {
             course: document.getElementById('editYearOfStudy').value,
             specialty: document.getElementById('editSpecialization').value,
             form: document.getElementById('editForm').value,
-            admissionYear: document.getElementById('editAdmissionYear').value
+            admissionYear: document.getElementById('editAdmissionYear').value,
+            curator_id: document.getElementById('editCurator').value
         };
 
         // Если ID пустой - создаем (POST), если есть - меняем (PUT)
@@ -131,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 modal.classList.add('hidden'); // Закрываем окно
                 loadGroups(); // Обновляем таблицу
             } else {
-                alert('Ошибка сохранения!');
+                response.json().then(data => alert(data.error || 'Ошибка сохранения'));
             }
         });
     };

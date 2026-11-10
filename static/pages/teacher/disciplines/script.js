@@ -13,9 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let courseVal = filterCourse.value;
 
         
-        let url = '/api/teacher/disciplines/?search_discipline=' + disciplineVal + 
-                  '&search_group=' + groupVal + 
-                  '&course=' + courseVal;
+        let url = '/api/teacher/disciplines/?' + new URLSearchParams({search_discipline: disciplineVal, search_group: groupVal, course: courseVal});
 
         fetch(url)
         .then(function(response) {
@@ -40,9 +38,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 let t = data[i];
                 
                 let row = '<tr>' +
-                    '<td>' + t.group + '</td>' +
+                    '<td>' + escapeHtml(t.group) + '</td>' +
                     '<td>' + t.course + '</td>' +
-                    '<td>' + t.discipline + '</td>' +
+                    '<td>' + escapeHtml(t.discipline) + '</td>' +
                     '<td><button class="btn btn--secondary" onclick="window.location.href=\'/journal/' + t.id + '/\'">Журнал</button></td>' +
                 '</tr>';
                 

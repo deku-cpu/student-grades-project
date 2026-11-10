@@ -22,19 +22,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-student-grades-local-only')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', '1') == '1'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]').split(',')
+CSRF_FAILURE_VIEW = 'education.access.csrf_failure'
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'education.apps.EducationAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -54,6 +55,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'student_grades_project.urls'
+AUTHENTICATION_BACKENDS = ['education.auth.RoleBackend']
 
 TEMPLATES = [
     {
@@ -112,9 +114,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Yekaterinburg'
 
 USE_I18N = True
 
